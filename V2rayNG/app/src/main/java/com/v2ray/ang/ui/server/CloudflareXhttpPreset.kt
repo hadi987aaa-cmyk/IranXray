@@ -37,5 +37,5 @@ internal object CloudflareXhttpPreset {
     private fun isIpLiteral(value: String): Boolean =
         value.contains(':') || IPV4_PATTERN.matches(value)
 
-    private val IPV4_PATTERN = Regex("""(?:[0-9]{1,3}\\.){3}[0-9]{1,3}""")
+    private val IPV4_PATTERN = Regex("""(?:[0-9]{1,3}\.){3}[0-9]{1,3}""")
 }
