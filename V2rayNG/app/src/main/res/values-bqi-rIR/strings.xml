@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">تنظیمات Cloudflare ره اَمال کۊ</string>
+    <string name="server_cloudflare_preset_summary">واسه ابر نارنجی، VLESS + XHTTP ره روی TLS/HTTP/2 (ALPN h2) جور کِنه. تو بخش Network کلادفلر gRPC ره روشن کۊ؛ سرور مبدأ باید پورت ۴۴۳ ره با TLS و HTTP/2 قبول کِنه. اگه IPهای Cloudflare بسته بۊن، این تنظیم اتصال ره درست نکِنه.</string>
     <string name="server_lab_final_mask">finalMask خام JSON، قالوو: { FinalMaskObject }</string>
     <string name="preset_replace_title">%1$s جایگزین بۊ؟</string>
     <string name="preset_replace_message">%1$s ایسا مئن فهرست نی وو پاک ابۊ. وا %2$s جایگزین بۊ؟</string>
