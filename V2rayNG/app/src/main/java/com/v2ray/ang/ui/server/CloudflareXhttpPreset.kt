@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.server
 
 import com.v2ray.ang.AppConfig.TLS
-import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.NetworkType
 
 /**
