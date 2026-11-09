@@ -282,6 +282,14 @@ class ServerUiState(
         echOutbound = ""
     }
 
+    private fun isIpLiteral(value: String): Boolean {
+        if (value.contains(':')) return true
+        val octets = value.split('.')
+        return octets.size == 4 && octets.all { octet ->
+            octet.toIntOrNull()?.let { it in 0..255 } == true
+        }
+    }
+
     fun toProfileItem(initialConfig: ProfileItem, aetherListenPort: Int? = null, keepCommand: Boolean = false): ProfileItem {
         val isVmess = configType == EConfigType.VMESS
         val isVless = configType == EConfigType.VLESS
@@ -403,8 +411,7 @@ class ServerUiState(
         return built.copy(targetStrategy = targetStrategy.takeUnless { it.isBlank() || it == CoreOutboundBuilder.defaultTargetStrategy(built) })
     }
 
-    private companion object {
-        val IPV4_ADDRESS_PATTERN = Regex("""(?:[0-9]{1,3}\\.){3}[0-9]{1,3}""")
+    companion object {
 
         fun fromProfileItem(
             initialConfig: ProfileItem
