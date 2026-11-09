@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">Ötürmə zolaq genişliyi (dəstəklənən vahidlər: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Rejimi</string>
     <string name="server_lab_xhttp_extra">XHTTP Əlavə xam JSON, format: { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">Cloudflare parametrlərini tətbiq et</string>
+    <string name="server_cloudflare_preset_summary">Narıncı bulud proksisi üçün TLS/HTTP/2 (ALPN h2) üzərindən VLESS + XHTTP qurur. Cloudflare Network bölməsində gRPC-ni aktiv edin; mənşə serveri 443 portunda TLS və HTTP/2 qəbul etməlidir. Cloudflare IP-ləri bloklanıbsa, bu parametr bağlantını bərpa edə bilməz.</string>
     <string name="server_lab_final_mask">finalMask xam JSON, format: { FinalMaskObject }</string>
     <string name="preset_replace_title">%1$s əvəz edilsin?</string>
     <string name="preset_replace_message">Cari %1$s siyahıda yoxdur və itəcək. %2$s ilə əvəz edilsin?</string>
