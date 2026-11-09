@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">پهنای باند آپلود (واحدهای پشتیبانی‌شده: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">حالت XHTTP</string>
     <string name="server_lab_xhttp_extra">خام JSON XHTTP Extra، قالب: { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">اعمال تنظیمات Cloudflare</string>
+    <string name="server_cloudflare_preset_summary">VLESS + XHTTP روی TLS/HTTP/2 (با ALPN برابر h2) را برای ابر نارنجی تنظیم می‌کند. در بخش Network کلادفلر، gRPC را روشن کنید؛ سرور مبدأ باید TLS و HTTP/2 را روی پورت ۴۴۳ بپذیرد. این تنظیم، مسدود بودن IPهای Cloudflare را رفع نمی‌کند.</string>
     <string name="server_lab_final_mask">JSON خام finalMask، قالب: { FinalMaskObject }</string>
     <string name="preset_replace_title">%1$s جایگزین شود؟</string>
     <string name="preset_replace_message">%1$s فعلی در فهرست نیست و پاک می‌شود. با %2$s جایگزین شود؟</string>
