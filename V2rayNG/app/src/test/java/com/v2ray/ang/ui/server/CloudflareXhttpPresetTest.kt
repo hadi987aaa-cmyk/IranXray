@@ -51,7 +51,7 @@ class CloudflareXhttpPresetTest {
             host = "cdn.example.com",
         )
 
-        CloudflareXhttpPreset.apply(state)
+        state.applyCloudflareXhttpPreset()
 
         assertEquals("104.16.10.20", state.address)
         assertEquals("cdn.example.com", state.sni)
