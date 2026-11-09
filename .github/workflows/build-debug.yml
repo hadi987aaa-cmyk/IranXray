@@ -49,8 +49,20 @@ jobs:
           echo "y" | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
             --channel=0 --install "ndk;30.0.16248370"
           echo "NDK_HOME=$ANDROID_HOME/ndk/30.0.16248370" >> "$GITHUB_ENV"
-          sed -i '/^android {$/a\\    ndkVersion = "30.0.16248370"' "$GITHUB_WORKSPACE/V2rayNG/app/build.gradle.kts"
-
+          python3 - <<'PY'
+          from pathlib import Path
+          gradle_file = Path("V2rayNG/app/build.gradle.kts")
+          source = gradle_file.read_text()
+          marker = "android {\n"
+          if source.count(marker) != 1:
+              raise SystemExit("Expected exactly one Android Gradle block")
+          source = source.replace(
+              marker,
+              marker + '    ndkVersion = "30.0.16248370"\n',
+              1,
+          )
+          gradle_file.write_text(source)
+          PY
       - name: Restore cached HEV libraries
         id: cache-hev
         uses: actions/cache/restore@v6
