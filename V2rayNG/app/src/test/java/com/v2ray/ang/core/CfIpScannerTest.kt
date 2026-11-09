@@ -57,8 +57,10 @@ class CfIpScannerTest {
             random = Random(3),
         )
         assertEquals(3, targets.size)
+        val network = ipToLong("172.64.0.0")
         for (target in targets) {
-            assertTrue(target.address.startsWith("172.64."), target.address)
+            val value = ipToLong(target.address)
+            assertTrue(value in network..(network + (1L shl 19) - 1), target.address)
         }
     }
 
