@@ -9,6 +9,7 @@ import com.v2ray.ang.AppConfig.AETHER_ECH_DOMAIN
 import com.v2ray.ang.AppConfig.AETHER_MASQUE_SNI
 import com.v2ray.ang.AppConfig.DEFAULT_PORT
 import com.v2ray.ang.AppConfig.REALITY
+import com.v2ray.ang.AppConfig.TLS
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_ADDRESS_V4
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_MTU
 import com.v2ray.ang.AppConfig.WIREGUARD_LOCAL_REMOTE_DNS
@@ -251,6 +252,36 @@ class ServerUiState(
      * the Aether listen port of the settings when null. PattNG: [keepCommand] keeps it as typed, trimmed and
      * unweighed, as the screen's saved state does, which has no port of its own to weigh it on.
      */
+    /**
+     * Applies the client-side settings for VLESS + XHTTP behind Cloudflare's orange-cloud proxy.
+     * The origin must separately support TLS/H2, XHTTP, and Cloudflare gRPC proxying.
+     */
+    fun applyCloudflareXhttpPreset() {
+        val currentAddress = address.trim()
+        val configuredSni = sni.trim()
+        val configuredHost = host.trim()
+        val domain = configuredSni.ifBlank {
+            configuredHost.ifBlank {
+                currentAddress.takeUnless {
+                    it.contains(':') || IPV4_ADDRESS_PATTERN.matches(it)
+                }.orEmpty()
+            }
+        }
+
+        port = "443"
+        network = NetworkType.XHTTP.type
+        xhttpMode = "auto"
+        flow = ""
+        streamSecurity = TLS
+        allowInsecure = false
+        fingerPrint = fingerPrint.ifBlank { "chrome" }
+        alpn = "h2"
+        sni = domain
+        host = configuredHost.ifBlank { domain }
+        echConfigList = ""
+        echOutbound = ""
+    }
+
     fun toProfileItem(initialConfig: ProfileItem, aetherListenPort: Int? = null, keepCommand: Boolean = false): ProfileItem {
         val isVmess = configType == EConfigType.VMESS
         val isVless = configType == EConfigType.VLESS
@@ -372,7 +403,9 @@ class ServerUiState(
         return built.copy(targetStrategy = targetStrategy.takeUnless { it.isBlank() || it == CoreOutboundBuilder.defaultTargetStrategy(built) })
     }
 
-    companion object {
+    private companion object {
+        val IPV4_ADDRESS_PATTERN = Regex("""(?:[0-9]{1,3}\\.){3}[0-9]{1,3}""")
+
         fun fromProfileItem(
             initialConfig: ProfileItem
         ): ServerUiState =
