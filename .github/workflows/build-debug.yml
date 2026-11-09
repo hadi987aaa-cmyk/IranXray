@@ -190,6 +190,7 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           chmod 755 gradlew
           ./gradlew --no-daemon :app:testPlaystoreDebugUnitTest
+          ./gradlew --no-daemon :app:compilePlaystoreDebugKotlin
           ./gradlew --no-daemon :app:assemblePlaystoreDebug \
             -PiranXrayVersion=0.1.0 \
             -PABI_FILTERS="$ABI_FILTERS"
