@@ -1,7 +1,6 @@
 package com.v2ray.ang.ui.server
 
 import com.v2ray.ang.AppConfig.REALITY
-import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import org.junit.jupiter.api.Assertions.assertEquals
