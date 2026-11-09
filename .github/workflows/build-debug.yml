@@ -49,9 +49,7 @@ jobs:
           echo "y" | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
             --channel=0 --install "ndk;30.0.16248370"
           echo "NDK_HOME=$ANDROID_HOME/ndk/30.0.16248370" >> "$GITHUB_ENV"
-          sed -i '10i\\
-          \\
-              ndkVersion = "30.0.16248370"' "$GITHUB_WORKSPACE/V2rayNG/app/build.gradle.kts"
+          sed -i '/^android {$/a\\    ndkVersion = "30.0.16248370"' "$GITHUB_WORKSPACE/V2rayNG/app/build.gradle.kts"
 
       - name: Restore cached HEV libraries
         id: cache-hev
@@ -185,10 +183,14 @@ jobs:
           set -euo pipefail
           APK="$(find V2rayNG/app/build/outputs/apk/playstore/debug -name '*.apk' -print -quit)"
           test -n "$APK"
-          unzip -Z1 "$APK" | grep -q '^lib/arm64-v8a/libv2ray.so$'
-          unzip -Z1 "$APK" | grep -q '^lib/arm64-v8a/libaether.so$'
-          unzip -Z1 "$APK" | grep -q '^lib/arm64-v8a/libhev-socks5-tunnel.so$'
-          echo "Verified APK: $APK"
+          unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libv2ray.so$"
+          unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libhev-socks5-tunnel.so$"
+          if [ "$ABI_FILTERS" != "x86" ]; then
+            unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libaether.so$"
+            unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libpsiphon-tunnel-core.so$"
+            unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/liblyrebird.so$"
+          fi
+          echo "Verified APK for $ABI_FILTERS: $APK"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v7
