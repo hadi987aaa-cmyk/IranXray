@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">PattNG</string>
+    <string name="app_name" translatable="false">IranXray</string>
     <string name="app_widget_name">آلشت</string>
     <string name="app_tile_name">آلشت</string>
     <string name="app_tile_first_use">سی کرت ٱولی و کار بوردن ای ویژیی، ٱول ز من برنومه ی سرور ازاف کۊنین</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">سی وانۊ کردن، بلگه ن بلم بکشین!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">سرویس PattNG</string>
+    <string name="notification_channel_service">سرویس IranXray</string>
     <string name="notification_channel_subscription_updates">ورۊ کردن اشتراکا</string>
     <string name="notification_channel_connection_checks">واجۊری منپیز</string>
     <string name="notification_action_stop_v2ray">واڌاشتن</string>
@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">وا روء رئڌن پئنا باند (واهڌ)</string>
     <string name="server_lab_xhttp_mode">هالت XHTTP</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra خام JSON، قالوو: { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">تنظیمات Cloudflare ره اَمال کۊ</string>
+    <string name="server_cloudflare_preset_summary">واسه ابر نارنجی، VLESS + XHTTP ره روی TLS/HTTP/2 (ALPN h2) جور کِنه. تو بخش Network کلادفلر gRPC ره روشن کۊ؛ سرور مبدأ باید پورت ۴۴۳ ره با TLS و HTTP/2 قبول کِنه. اگه IPهای Cloudflare بسته بۊن، این تنظیم اتصال ره درست نکِنه.</string>
     <string name="server_lab_final_mask">finalMask خام JSON، قالوو: { FinalMaskObject }</string>
     <string name="preset_replace_title">%1$s جایگزین بۊ؟</string>
     <string name="preset_replace_message">%1$s ایسا مئن فهرست نی وو پاک ابۊ. وا %2$s جایگزین بۊ؟</string>

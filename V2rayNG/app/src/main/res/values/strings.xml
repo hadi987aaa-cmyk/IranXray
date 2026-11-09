@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">PattNG</string>
+    <string name="app_name" translatable="false">IranXray</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
     <string name="app_tile_first_use">Add a profile in the app before using this feature.</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">Please pull down to refresh!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">PattNG service</string>
+    <string name="notification_channel_service">IranXray service</string>
     <string name="notification_channel_subscription_updates">Subscription updates</string>
     <string name="notification_channel_connection_checks">Connection checks</string>
     <string name="notification_action_stop_v2ray">Stop</string>
@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">Upload bandwidth (supported units: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP Mode</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra raw JSON, format: { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">Apply Cloudflare preset</string>
+    <string name="server_cloudflare_preset_summary">Configures VLESS + XHTTP over TLS/HTTP/2 (ALPN h2) for the orange-cloud proxy. Enable gRPC in Cloudflare Network settings; the origin must accept TLS and HTTP/2 on port 443. This cannot restore access when Cloudflare IPs are blocked.</string>
     <string name="server_lab_final_mask">finalMask raw JSON, format: { FinalMaskObject }</string>
     <string name="preset_replace_title">Replace the %1$s?</string>
     <string name="preset_replace_message">The current %1$s is not on the list and will be lost. Replace it with %2$s?</string>

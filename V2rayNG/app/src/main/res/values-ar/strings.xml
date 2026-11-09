@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">PattNG</string>
+    <string name="app_name" translatable="false">IranXray</string>
     <string name="app_widget_name">التبديل</string>
     <string name="app_tile_name">التبديل</string>
     <string name="app_tile_first_use">أول استخدام لهذه الميزة، يرجى استخدام التطبيق لإضافة خادم</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">اسحب لأسفل للتحديث!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">خدمة PattNG</string>
+    <string name="notification_channel_service">خدمة IranXray</string>
     <string name="notification_channel_subscription_updates">تحديثات الاشتراكات</string>
     <string name="notification_channel_connection_checks">فحوص الاتصال</string>
     <string name="notification_action_stop_v2ray">إيقاف</string>
@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">عرض النطاق للرفع (الوحدات المدعومة: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">وضع XHTTP</string>
     <string name="server_lab_xhttp_extra">JSON خام لحقل XHTTP Extra، بالتنسيق: { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">تطبيق إعدادات Cloudflare</string>
+    <string name="server_cloudflare_preset_summary">يضبط VLESS + XHTTP عبر TLS/HTTP/2 ‏(ALPN h2) للعمل خلف السحابة البرتقالية. فعّل gRPC من إعدادات Network في Cloudflare، ويجب أن يقبل الخادم الأصلي TLS وHTTP/2 على المنفذ 443. لا يعيد هذا الإعداد الاتصال إذا كانت عناوين Cloudflare محظورة.</string>
     <string name="server_lab_final_mask">JSON خام لحقل finalMask، بالتنسيق: { FinalMaskObject }</string>
     <string name="preset_replace_title">استبدال %1$s؟</string>
     <string name="preset_replace_message">قيمة %1$s الحالية ليست من القائمة وستُفقد. هل تريد استبدالها بـ %2$s؟</string>

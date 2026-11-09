@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">PattNG</string>
+    <string name="app_name" translatable="false">IranXray</string>
     <string name="app_widget_name">開關</string>
     <string name="app_tile_name">開關</string>
     <string name="app_tile_first_use">首次使用此功能，請使用此應用程式新增伺服器</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">請下拉重新整理！</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">PattNG 服務</string>
+    <string name="notification_channel_service">IranXray 服務</string>
     <string name="notification_channel_subscription_updates">訂閱更新</string>
     <string name="notification_channel_connection_checks">連線檢查</string>
     <string name="notification_action_stop_v2ray">停止</string>
@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">上傳頻寬（支援的單位：k/m/g/t）</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">套用 Cloudflare 預設</string>
+    <string name="server_cloudflare_preset_summary">為橘色雲代理設定透過 TLS/HTTP/2（ALPN h2）的 VLESS + XHTTP。請在 Cloudflare 的 Network 設定中啟用 gRPC；來源伺服器必須在 443 連接埠接受 TLS 與 HTTP/2。若 Cloudflare IP 已遭封鎖，此設定無法恢復連線。</string>
     <string name="server_lab_final_mask">finalMask 原始 JSON，格式：{ FinalMaskObject }</string>
     <string name="preset_replace_title">取代 %1$s？</string>
     <string name="preset_replace_message">目前的 %1$s 不在清單中，取代後將遺失。要取代為 %2$s 嗎？</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">PattNG</string>
+    <string name="app_name" translatable="false">IranXray</string>
     <string name="app_widget_name">সুইচ</string>
     <string name="app_tile_name">সুইচ</string>
     <string name="app_tile_first_use">এই ফিচারটি প্রথম ব্যবহার করা হচ্ছে, সার্ভার যোগ করতে অ্যাপটি ব্যবহার করুন</string>
@@ -14,7 +14,7 @@
     <string name="pull_down_to_refresh">রিফ্রেশ করতে নিচে টানুন!</string>
 
     <!-- Notifications -->
-    <string name="notification_channel_service">PattNG সার্ভিস</string>
+    <string name="notification_channel_service">IranXray সার্ভিস</string>
     <string name="notification_channel_subscription_updates">সাবস্ক্রিপশন আপডেট</string>
     <string name="notification_channel_connection_checks">সংযোগ পরীক্ষা</string>
     <string name="notification_action_stop_v2ray">বন্ধ করুন</string>
@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">আপলোড ব্যান্ডউইডথ (সমর্থিত একক: k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP মোড</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra-এর কাঁচা JSON, ফরম্যাট: { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">Cloudflare প্রিসেট প্রয়োগ করুন</string>
+    <string name="server_cloudflare_preset_summary">কমলা ক্লাউড প্রক্সির জন্য TLS/HTTP/2 (ALPN h2) দিয়ে VLESS + XHTTP সেট করে। Cloudflare Network সেটিংসে gRPC চালু করুন; origin সার্ভারকে ৪৪৩ পোর্টে TLS ও HTTP/2 গ্রহণ করতে হবে। Cloudflare IP ব্লক থাকলে এই সেটিং সংযোগ ফিরিয়ে আনতে পারবে না।</string>
     <string name="server_lab_final_mask">finalMask-এর কাঁচা JSON, ফরম্যাট: { FinalMaskObject }</string>
     <string name="preset_replace_title">%1$s বদলাবেন?</string>
     <string name="preset_replace_message">বর্তমান %1$s তালিকায় নেই এবং হারিয়ে যাবে। এর বদলে %2$s বসাবেন?</string>
