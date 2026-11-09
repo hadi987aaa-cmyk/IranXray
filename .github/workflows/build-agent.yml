@@ -44,6 +44,7 @@ jobs:
       VERSION_NAME: ${{ inputs.version || '0.2.0' }}
       # An unset secret evaluates to an empty string, which the restore step keys on.
       DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+      RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
 
     steps:
       - name: Checkout source and submodules
@@ -212,19 +213,33 @@ jobs:
       - name: Run unit tests and assemble APK
         working-directory: V2rayNG
         run: |
+          set -euo pipefail
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           chmod 755 gradlew
           ./gradlew --no-daemon :app:testPlaystoreDebugUnitTest
           ./gradlew --no-daemon :app:compilePlaystoreDebugKotlin
-          ./gradlew --no-daemon :app:assemblePlaystoreDebug \
-            -PiranXrayVersion="$VERSION_NAME" \
-            -PABI_FILTERS="$ABI_FILTERS"
+          if [ -n "${RELEASE_KEYSTORE_BASE64:-}" ]; then
+            printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            ./gradlew --no-daemon :app:assemblePlaystoreRelease \
+              -PiranXrayVersion="$VERSION_NAME" \
+              -PABI_FILTERS="$ABI_FILTERS" \
+              -Pandroid.injected.signing.store.file="$RUNNER_TEMP/release.jks" \
+              -Pandroid.injected.signing.store.password="Cloak1405Iran" \
+              -Pandroid.injected.signing.key.alias="cloak" \
+              -Pandroid.injected.signing.key.password="Cloak1405Iran"
+            echo "APK_DIR=V2rayNG/app/build/outputs/apk/playstore/release" >> "$GITHUB_ENV"
+          else
+            ./gradlew --no-daemon :app:assemblePlaystoreDebug \
+              -PiranXrayVersion="$VERSION_NAME" \
+              -PABI_FILTERS="$ABI_FILTERS"
+            echo "APK_DIR=V2rayNG/app/build/outputs/apk/playstore/debug" >> "$GITHUB_ENV"
+          fi
 
-      - name: Upload debug APK
+      - name: Upload the APK
         uses: actions/upload-artifact@v7
         with:
-          name: IranXray-debug-${{ env.ABI_FILTERS }}-${{ github.run_number }}
-          path: V2rayNG/app/build/outputs/apk/playstore/debug/*.apk
+          name: IranXray-${{ env.ABI_FILTERS }}-${{ github.run_number }}
+          path: ${{ env.APK_DIR }}/*.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -236,18 +251,17 @@ jobs:
           body: |
             ABI: `${{ env.ABI_FILTERS }}`
             Version: `${{ env.VERSION_NAME }}`
+            Signing: `${{ env.RELEASE_KEYSTORE_BASE64 != '' && 'release (stable key)' || 'debug' }}`
             Commit: `${{ github.sha }}`
-          files: V2rayNG/app/build/outputs/apk/playstore/debug/*.apk
+          files: ${{ env.APK_DIR }}/*.apk
           fail_on_unmatched_files: true
 
-      # Reports what the APK carries. Informational only: the artifact and the release are
-      # already published above, so a surprise here cannot cost the user their APK.
-      - name: Inspect packaged native libraries
+      # Informational only: the artifact and the release are published above.
+      - name: Inspect the packaged APK
         continue-on-error: true
         run: |
           set -uo pipefail
-          ls -l V2rayNG/app/build/outputs/apk/playstore/debug || true
-          APK="$(find V2rayNG/app/build/outputs/apk/playstore/debug -name '*.apk' | head -n 1)"
+          APK="$(find "${{ env.APK_DIR }}" -name '*.apk' | head -n 1)"
           if [ -z "$APK" ]; then
             echo "no APK found for inspection"
             exit 0
@@ -255,10 +269,14 @@ jobs:
           echo "APK: $APK ($(stat -c%s "$APK") bytes)"
           unzip -Z1 "$APK" > /tmp/entries.txt || true
           grep '^lib/' /tmp/entries.txt | sort || true
-          for name in libv2ray.so libhev-socks5-tunnel.so libaether.so libpsiphon-tunnel-core.so liblyrebird.so libhevsockstun.so; do
+          for name in libgojni.so libhev-socks5-tunnel.so libaether.so libpsiphon-tunnel-core.so liblyrebird.so libhevsockstun.so; do
             if grep -q "/$name$" /tmp/entries.txt; then
               echo "ok      $name"
             else
               echo "::warning::$name is not packaged"
             fi
           done
+          APKSIGNER="$(ls "$ANDROID_HOME"/build-tools/*/apksigner 2>/dev/null | tail -n 1)"
+          if [ -n "$APKSIGNER" ]; then
+            "$APKSIGNER" verify --print-certs "$APK" | head -n 5 || true
+          fi
