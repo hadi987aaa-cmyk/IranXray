@@ -194,7 +194,7 @@ jobs:
         # build before anything is assembled or signed.
         ./gradlew :app:testPlaystoreDebugUnitTest
         ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleRelease -PpattngVersion="${{ inputs.release_tag }}" -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
+        ./gradlew assembleRelease -PiranXrayVersion="${{ inputs.release_tag }}" -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
     
     - name: Check the native libraries in the APKs
       run: |
@@ -268,14 +268,14 @@ jobs:
             gpg --batch --yes --local-user "$KEY" --detach-sign --output "release-files/$(basename "$apk").sig" "$apk"
           done
 
-          gpg --armor --export "$KEY" > release-files/PattNG-public-key.asc
+          gpg --armor --export "$KEY" > release-files/IranXray-public-key.asc
 
       - name: Upload APKs, signatures and public key to release
         uses: svenstaro/upload-release-action@v2
         with:
           file: release-files/*
           tag: ${{ inputs.release_tag }}
-          release_name: PattNG v${{ inputs.release_tag }}
+          release_name: IranXray v${{ inputs.release_tag }}
           body: "."
           target_commit: ${{ github.sha }}
           file_glob: true
