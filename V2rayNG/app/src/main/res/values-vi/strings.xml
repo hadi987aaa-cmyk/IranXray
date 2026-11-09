@@ -788,4 +788,13 @@
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
 
+    <string name="cf_scan_title">Quét IP Cloudflare</string>
+    <string name="cf_scan_sni_label">SNI / tên miền</string>
+    <string name="cf_scan_start">Quét</string>
+    <string name="cf_scan_stop">Dừng</string>
+    <string name="cf_scan_progress">%1$d / %2$d</string>
+    <string name="cf_scan_latency">%1$d ms</string>
+    <string name="cf_scan_empty">Không có địa chỉ nào phản hồi. Kiểm tra SNI có đúng tên miền của cấu hình này không rồi quét lại.</string>
+    <string name="cf_scan_missing_sni">Hãy nhập SNI của cấu hình này trước.</string>
+    <string name="cf_scan_no_candidates">Không có địa chỉ nào để quét.</string>
 </resources>

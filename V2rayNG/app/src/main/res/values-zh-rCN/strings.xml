@@ -788,4 +788,13 @@
     <string name="sub_info_open_page">打开订阅信息页面</string>
     <string name="sub_info_unlimited">无限制</string>
 
+    <string name="cf_scan_title">Cloudflare IP 扫描</string>
+    <string name="cf_scan_sni_label">SNI / 域名</string>
+    <string name="cf_scan_start">扫描</string>
+    <string name="cf_scan_stop">停止</string>
+    <string name="cf_scan_progress">%1$d / %2$d</string>
+    <string name="cf_scan_latency">%1$d 毫秒</string>
+    <string name="cf_scan_empty">没有地址响应。请确认 SNI 是该配置的域名，然后重新扫描。</string>
+    <string name="cf_scan_missing_sni">请先填写该配置的 SNI。</string>
+    <string name="cf_scan_no_candidates">没有可扫描的地址。</string>
 </resources>

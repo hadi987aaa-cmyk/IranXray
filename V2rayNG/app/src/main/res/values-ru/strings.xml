@@ -794,4 +794,13 @@
     <string name="sub_info_open_page">Открыть страницу подписки</string>
     <string name="sub_info_unlimited">Без ограничений</string>
 
+    <string name="cf_scan_title">Сканирование IP Cloudflare</string>
+    <string name="cf_scan_sni_label">SNI / домен</string>
+    <string name="cf_scan_start">Сканировать</string>
+    <string name="cf_scan_stop">Стоп</string>
+    <string name="cf_scan_progress">%1$d / %2$d</string>
+    <string name="cf_scan_latency">%1$d мс</string>
+    <string name="cf_scan_empty">Ни один адрес не ответил. Убедитесь, что SNI совпадает с доменом профиля, и повторите.</string>
+    <string name="cf_scan_missing_sni">Сначала укажите SNI этого профиля.</string>
+    <string name="cf_scan_no_candidates">Нет адресов для сканирования.</string>
 </resources>

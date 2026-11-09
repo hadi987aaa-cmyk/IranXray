@@ -790,4 +790,13 @@
     <string name="sub_info_open_page">সাবস্ক্রিপশন তথ্যের পাতা খুলুন</string>
     <string name="sub_info_unlimited">সীমাহীন</string>
 
+    <string name="cf_scan_title">Cloudflare IP স্ক্যান</string>
+    <string name="cf_scan_sni_label">SNI / ডোমেইন</string>
+    <string name="cf_scan_start">স্ক্যান</string>
+    <string name="cf_scan_stop">থামুন</string>
+    <string name="cf_scan_progress">%1$d / %2$d</string>
+    <string name="cf_scan_latency">%1$d মিলিসেকেন্ড</string>
+    <string name="cf_scan_empty">কোনো ঠিকানা সাড়া দেয়নি। SNI এই প্রোফাইলের ডোমেইন কিনা দেখে আবার স্ক্যান করুন।</string>
+    <string name="cf_scan_missing_sni">আগে এই প্রোফাইলের SNI লিখুন।</string>
+    <string name="cf_scan_no_candidates">স্ক্যান করার কোনো ঠিকানা নেই।</string>
 </resources>

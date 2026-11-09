@@ -227,27 +227,43 @@ jobs:
       - name: Inspect packaged native libraries
         run: |
           set -uo pipefail
-          APK="$(find V2rayNG/app/build/outputs/apk/playstore/debug -name '*.apk' -print -quit)"
-          if [ -z "$APK" ]; then echo "::error::no APK was produced"; exit 1; fi
-          echo "APK: $APK ($(stat -c%s "$APK") bytes)"
-          unzip -Z1 "$APK" | grep '^lib/' | sort > /tmp/libs.txt || true
-          cat /tmp/libs.txt
-          missing_core=""
-          for name in libv2ray.so libhev-socks5-tunnel.so; do
-            grep -qx "lib/$ABI_FILTERS/$name" /tmp/libs.txt || missing_core="$missing_core $name"
-          done
-          if [ -n "$missing_core" ]; then
-            echo "::error::missing core libraries in lib/$ABI_FILTERS:$missing_core"
+          echo "--- apk directory ---"
+          ls -l V2rayNG/app/build/outputs/apk/playstore/debug || true
+          APK="$(find V2rayNG/app/build/outputs/apk/playstore/debug -name '*.apk' | head -n 1)"
+          if [ -z "$APK" ]; then
+            echo "::error::no APK was produced"
             exit 1
           fi
-          for name in libaether.so libpsiphon-tunnel-core.so liblyrebird.so libhevsockstun.so; do
-            if grep -qx "lib/$ABI_FILTERS/$name" /tmp/libs.txt; then
-              echo "ok      $name"
+          echo "APK: $APK ($(stat -c%s "$APK") bytes)"
+          python3 -c "import sys, zipfile; print('\n'.join(sorted(n for n in zipfile.ZipFile(sys.argv[1]).namelist() if n.startswith('lib/'))))" "$APK" > /tmp/libs.txt
+          echo "--- lib/ entries ---"
+          cat /tmp/libs.txt
+          check() {
+            if grep -qx "lib/$ABI_FILTERS/$1" /tmp/libs.txt; then
+              echo "ok      $1"
             else
-              echo "::warning::not packaged for $ABI_FILTERS: $name"
+              echo "missing $1"
+            fi
+          }
+          core_missing=0
+          for name in libv2ray.so libhev-socks5-tunnel.so; do
+            if ! grep -qx "lib/$ABI_FILTERS/$name" /tmp/libs.txt; then
+              if grep -qx ".*/$name" /tmp/libs.txt; then
+                echo "::warning::$name is packaged under another ABI than $ABI_FILTERS"
+              else
+                echo "::error::$name is not packaged at all"
+                core_missing=1
+              fi
+            else
+              echo "ok      $name"
             fi
           done
-
+          for name in libaether.so libpsiphon-tunnel-core.so liblyrebird.so libhevsockstun.so; do
+            check "$name"
+          done
+          if [ "$core_missing" -ne 0 ]; then
+            exit 1
+          fi
       - name: Upload debug APK
         uses: actions/upload-artifact@v7
         with:

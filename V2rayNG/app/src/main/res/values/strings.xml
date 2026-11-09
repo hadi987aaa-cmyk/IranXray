@@ -799,4 +799,13 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Unlimited</string>
 
+    <string name="cf_scan_title">Cloudflare IP scan</string>
+    <string name="cf_scan_sni_label">SNI / domain</string>
+    <string name="cf_scan_start">Scan</string>
+    <string name="cf_scan_stop">Stop</string>
+    <string name="cf_scan_progress">%1$d / %2$d</string>
+    <string name="cf_scan_latency">%1$d ms</string>
+    <string name="cf_scan_empty">No address answered. Check that the SNI is the one this profile uses, then scan again.</string>
+    <string name="cf_scan_missing_sni">Enter the SNI of this profile first.</string>
+    <string name="cf_scan_no_candidates">There is no address to scan.</string>
 </resources>
