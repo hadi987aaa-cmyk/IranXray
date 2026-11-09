@@ -213,9 +213,4 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-        uses: actions/upload-artifact@v7
-        with:
-          name: IranXray-debug-${{ env.ABI_FILTERS }}
-          path: V2rayNG/app/build/outputs/apk/playstore/debug/*.apk
-          if-no-files-found: error
-          retention-days: 14
+
