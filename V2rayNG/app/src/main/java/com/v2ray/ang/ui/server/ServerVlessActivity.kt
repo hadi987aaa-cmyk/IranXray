@@ -37,7 +37,7 @@ class ServerVlessActivity : BaseServerActivity() {
             CommonBasicFields(uiState)
             VlessProtocolFields(uiState, flowOptions)
             Button(
-                onClick = { CloudflareXhttpPreset.apply(uiState) }
+                onClick = { uiState.applyCloudflareXhttpPreset() }
             ) {
                 Text(stringResource(R.string.server_cloudflare_preset))
             }
