@@ -1,5 +1,7 @@
 package com.v2ray.ang.ui.server
 
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,6 +36,12 @@ class ServerVlessActivity : BaseServerActivity() {
         ) {
             CommonBasicFields(uiState)
             VlessProtocolFields(uiState, flowOptions)
+            Button(
+                onClick = { CloudflareXhttpPreset.apply(uiState) }
+            ) {
+                Text(stringResource(R.string.server_cloudflare_preset))
+            }
+            Text(stringResource(R.string.server_cloudflare_preset_summary))
             CommonNetworkFields(uiState, options)
             CommonTargetStrategyField(uiState)
             CommonStreamSecurityFields(
