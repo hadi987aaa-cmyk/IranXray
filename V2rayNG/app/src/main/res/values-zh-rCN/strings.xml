@@ -134,6 +134,8 @@
     <string name="server_lab_bandwidth_up">带宽上行 (支持的单位 k/m/g/t)</string>
     <string name="server_lab_xhttp_mode">XHTTP 模式</string>
     <string name="server_lab_xhttp_extra">XHTTP Extra 原始 JSON，格式： { XHTTPObject }</string>
+    <string name="server_cloudflare_preset">应用 Cloudflare 预设</string>
+    <string name="server_cloudflare_preset_summary">为橙色云代理配置基于 TLS/HTTP/2（ALPN h2）的 VLESS + XHTTP。请在 Cloudflare 的 Network 设置中启用 gRPC；源站必须在 443 端口接受 TLS 和 HTTP/2。如果 Cloudflare IP 已被封锁，此设置无法恢复连接。</string>
     <string name="server_lab_final_mask">FinalMask 原始 JSON 格式: { FinalMaskObject }</string>
     <string name="preset_replace_title">替换 %1$s？</string>
     <string name="preset_replace_message">当前的 %1$s 不在列表中，替换后将丢失。要替换为 %2$s 吗？</string>
