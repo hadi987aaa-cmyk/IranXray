@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui.server
 
 import com.v2ray.ang.AppConfig.REALITY
+import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.enums.NetworkType
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -40,6 +41,35 @@ class CloudflareXhttpPresetTest {
         assertEquals("keep-existing-key", state.publicKeyReality)
         assertTrue(state.echConfigList.isBlank())
         assertTrue(state.echOutbound.isBlank())
+    }
+
+    @Test
+    fun appliedPresetProducesACloudflareCompatibleVlessProfile() {
+        val state = ServerUiState(
+            configType = EConfigType.VLESS,
+            address = "104.16.10.20",
+            password = "client-id",
+            sni = "cdn.example.com",
+            host = "cdn.example.com",
+            path = "/xray",
+            flow = "xtls-rprx-vision",
+        )
+
+        state.applyCloudflareXhttpPreset()
+        val profile = state.toProfileItem(ProfileItem.create(EConfigType.VLESS))
+
+        assertEquals("104.16.10.20", profile.server)
+        assertEquals("443", profile.serverPort)
+        assertEquals(NetworkType.XHTTP.type, profile.network)
+        assertEquals("tls", profile.security)
+        assertEquals("cdn.example.com", profile.sni)
+        assertEquals("cdn.example.com", profile.host)
+        assertEquals("/xray", profile.path)
+        assertEquals("h2", profile.alpn)
+        assertEquals("auto", profile.xhttpMode)
+        assertTrue(profile.flow.isNullOrBlank())
+        assertFalse(profile.insecure == true)
+        assertEquals("client-id", profile.password)
     }
 
     @Test
