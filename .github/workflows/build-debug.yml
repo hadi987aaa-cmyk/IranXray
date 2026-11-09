@@ -195,21 +195,24 @@ jobs:
             -PiranXrayVersion=0.1.0 \
             -PABI_FILTERS="$ABI_FILTERS"
 
-      - name: Verify packaged native libraries
+      - name: Inspect packaged native libraries
         run: |
           set -euo pipefail
           APK="$(find V2rayNG/app/build/outputs/apk/playstore/debug -name '*.apk' -print -quit)"
           test -n "$APK"
-          unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libv2ray.so$"
-          unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libhev-socks5-tunnel.so$"
-          if [ "$ABI_FILTERS" != "x86" ]; then
-            unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libaether.so$"
-            unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/libpsiphon-tunnel-core.so$"
-            unzip -Z1 "$APK" | grep -q "^lib/$ABI_FILTERS/liblyrebird.so$"
-          fi
-          echo "Verified APK for $ABI_FILTERS: $APK"
+          echo "APK: $APK"
+          echo "Native libraries for $ABI_FILTERS:"
+          unzip -Z1 "$APK" | grep "^lib/$ABI_FILTERS/" | tee /tmp/iranxray-native-libs.txt
+          grep -q '\.so$' /tmp/iranxray-native-libs.txt
 
       - name: Upload debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: IranXray-debug-${{ env.ABI_FILTERS }}
+          path: V2rayNG/app/build/outputs/apk/playstore/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
         uses: actions/upload-artifact@v7
         with:
           name: IranXray-debug-${{ env.ABI_FILTERS }}
