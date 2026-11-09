@@ -1,0 +1,269 @@
+name: Build Agent APK
+
+# The agent's own pipeline. It builds every commit on an `agent/**` branch and publishes the
+# debug APK as a release asset, so nothing here depends on, or interferes with, the debug
+# workflow that builds `iranxray/**`. The cache keys are identical to that workflow's, so a
+# branch that already warmed the natives makes this build start warm as well.
+
+on:
+  workflow_dispatch:
+    inputs:
+      abi:
+        description: Android ABI to package
+        required: true
+        type: choice
+        options:
+          - arm64-v8a
+          - armeabi-v7a
+          - x86_64
+          - x86
+        default: arm64-v8a
+      version:
+        description: Version name written into the APK file name
+        required: false
+        default: 0.2.0
+  push:
+    branches:
+      - 'agent/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agent-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      RUST_TOOLCHAIN: stable
+      GO_VERSION: "1.26"
+      ABI_FILTERS: ${{ inputs.abi || 'arm64-v8a' }}
+      VERSION_NAME: ${{ inputs.version || '0.2.0' }}
+      # An unset secret evaluates to an empty string, which the restore step keys on.
+      DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+
+    steps:
+      - name: Checkout source and submodules
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          log-accepted-android-sdk-licenses: false
+          cmdline-tools-version: '14742923'
+          packages: 'platforms;android-37.0 build-tools;37.0.0 platform-tools'
+
+      - name: Install Android NDK
+        run: |
+          echo "y" | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            --channel=0 --install "ndk;30.0.16248370"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/30.0.16248370" >> "$GITHUB_ENV"
+          python3 - <<'PY'
+          from pathlib import Path
+          gradle_file = Path("V2rayNG/app/build.gradle.kts")
+          source = gradle_file.read_text()
+          marker = "android {\n"
+          if source.count(marker) != 1:
+              raise SystemExit("Expected exactly one Android Gradle block")
+          source = source.replace(
+              marker,
+              marker + '    ndkVersion = "30.0.16248370"\n',
+              1,
+          )
+          gradle_file.write_text(source)
+          PY
+
+      # A debug APK is signed with a key the runner generates per build, which makes every
+      # update a different signature and Android refuse it. Restoring a fixed key keeps the
+      # build updatable in place. The step is skipped when the secret is not configured.
+      - name: Restore the debug signing key
+        if: ${{ env.DEBUG_KEYSTORE_BASE64 != '' }}
+        run: |
+          mkdir -p "$HOME/.android"
+          printf '%s' "$DEBUG_KEYSTORE_BASE64" | base64 -d > "$HOME/.android/debug.keystore"
+          keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android \
+            | grep -E 'Alias name|SHA256' || true
+
+      - name: Restore cached HEV libraries
+        id: cache-hev
+        uses: actions/cache/restore@v6
+        with:
+          path: libs
+          key: hev-${{ runner.os }}-ndk30-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD', 'compile-hevtun.sh') }}
+
+      - name: Build HEV libraries
+        if: steps.cache-hev.outputs.cache-hit != 'true'
+        run: bash compile-hevtun.sh
+
+      - name: Save HEV libraries
+        if: steps.cache-hev.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: libs
+          key: hev-${{ runner.os }}-ndk30-${{ hashFiles('.git/modules/hev-socks5-tunnel/HEAD', 'compile-hevtun.sh') }}
+
+      - name: Install Rust
+        id: rust-toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+
+      - name: Restore cached Aether libraries
+        id: cache-aether
+        uses: actions/cache/restore@v6
+        with:
+          path: libs-aether
+          key: aether-${{ runner.os }}-ndk30-${{ steps.rust-toolchain.outputs.cachekey }}-${{ hashFiles('.git/modules/aether/HEAD', 'compile-aether.sh') }}
+
+      - name: Build Aether libraries
+        if: steps.cache-aether.outputs.cache-hit != 'true'
+        run: bash compile-aether.sh
+
+      - name: Save Aether libraries
+        if: steps.cache-aether.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: libs-aether
+          key: aether-${{ runner.os }}-ndk30-${{ steps.rust-toolchain.outputs.cachekey }}-${{ hashFiles('.git/modules/aether/HEAD', 'compile-aether.sh') }}
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Restore cached Psiphon client
+        id: cache-psiphon
+        uses: actions/cache/restore@v6
+        with:
+          path: libs-psiphon
+          key: psiphon-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/psiphon-build.sh', 'compile-psiphon.sh') }}
+
+      - name: Build Psiphon client
+        if: steps.cache-psiphon.outputs.cache-hit != 'true'
+        run: bash compile-psiphon.sh
+
+      - name: Save Psiphon client
+        if: steps.cache-psiphon.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: libs-psiphon
+          key: psiphon-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/psiphon-build.sh', 'compile-psiphon.sh') }}
+
+      - name: Restore cached pluggable transport
+        id: cache-pt
+        uses: actions/cache/restore@v6
+        with:
+          path: libs-pt
+          key: pt-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/pt-build.sh', 'compile-pt.sh') }}
+
+      - name: Build pluggable transport
+        if: steps.cache-pt.outputs.cache-hit != 'true'
+        run: bash compile-pt.sh
+
+      - name: Save pluggable transport
+        if: steps.cache-pt.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: libs-pt
+          key: pt-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles('aether/pt-build.sh', 'compile-pt.sh') }}
+
+      - name: Stage native libraries
+        run: |
+          mkdir -p V2rayNG/app/libs
+          cp -r libs/. V2rayNG/app/libs/
+          cp -r libs-aether/. V2rayNG/app/libs/
+          cp -r libs-psiphon/. V2rayNG/app/libs/
+          cp -r libs-pt/. V2rayNG/app/libs/
+          echo "staged:"
+          find V2rayNG/app/libs -name '*.so' | sort
+
+      - name: Fetch and verify Psiphon server list
+        run: bash fetch-psiphon-servers.sh
+
+      - name: Resolve pinned Xray Android library tag
+        run: |
+          cd AndroidLibXrayLite
+          CURRENT_TAG="$(git describe --tags --abbrev=0)"
+          echo "Using AndroidLibXrayLite tag: $CURRENT_TAG"
+          echo "CURRENT_TAG=$CURRENT_TAG" >> "$GITHUB_ENV"
+
+      - name: Download Xray Android library
+        uses: robinraju/release-downloader@v1.13
+        with:
+          repository: patterniha/AndroidLibXrayLite
+          tag: ${{ env.CURRENT_TAG }}
+          fileName: libv2ray.aar
+          out-file-path: V2rayNG/app/libs/
+
+      - name: Set up Java
+        uses: actions/setup-java@v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Run unit tests and assemble APK
+        working-directory: V2rayNG
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          chmod 755 gradlew
+          ./gradlew --no-daemon :app:testPlaystoreDebugUnitTest
+          ./gradlew --no-daemon :app:compilePlaystoreDebugKotlin
+          ./gradlew --no-daemon :app:assemblePlaystoreDebug \
+            -PiranXrayVersion="$VERSION_NAME" \
+            -PABI_FILTERS="$ABI_FILTERS"
+
+      # Lists everything the APK actually carries, then fails only when a library the app
+      # cannot start without is absent. The companion binaries (aether, psiphon, lyrebird)
+      # are reported but do not fail the build, so one missing optional core still yields an
+      # installable APK.
+      - name: Inspect packaged native libraries
+        run: |
+          set -uo pipefail
+          APK="$(find V2rayNG/app/build/outputs/apk/playstore/debug -name '*.apk' -print -quit)"
+          if [ -z "$APK" ]; then echo "::error::no APK was produced"; exit 1; fi
+          echo "APK: $APK ($(stat -c%s "$APK") bytes)"
+          unzip -Z1 "$APK" | grep '^lib/' | sort > /tmp/libs.txt || true
+          cat /tmp/libs.txt
+          missing_core=""
+          for name in libv2ray.so libhev-socks5-tunnel.so; do
+            grep -qx "lib/$ABI_FILTERS/$name" /tmp/libs.txt || missing_core="$missing_core $name"
+          done
+          if [ -n "$missing_core" ]; then
+            echo "::error::missing core libraries in lib/$ABI_FILTERS:$missing_core"
+            exit 1
+          fi
+          for name in libaether.so libpsiphon-tunnel-core.so liblyrebird.so libhevsockstun.so; do
+            if grep -qx "lib/$ABI_FILTERS/$name" /tmp/libs.txt; then
+              echo "ok      $name"
+            else
+              echo "::warning::not packaged for $ABI_FILTERS: $name"
+            fi
+          done
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: IranXray-debug-${{ env.ABI_FILTERS }}-${{ github.run_number }}
+          path: V2rayNG/app/build/outputs/apk/playstore/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publish the APK as a release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: agent-${{ github.run_number }}
+          name: IranXray agent build ${{ github.run_number }}
+          body: |
+            ABI: `${{ env.ABI_FILTERS }}`
+            Version: `${{ env.VERSION_NAME }}`
+            Commit: `${{ github.sha }}`
+          files: V2rayNG/app/build/outputs/apk/playstore/debug/*.apk
+          fail_on_unmatched_files: true
