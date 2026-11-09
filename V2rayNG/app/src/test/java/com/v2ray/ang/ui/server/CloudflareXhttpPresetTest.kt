@@ -23,7 +23,7 @@ class CloudflareXhttpPresetTest {
             path = "/private-xhttp-path",
         )
 
-        CloudflareXhttpPreset.apply(state)
+        state.applyCloudflareXhttpPreset()
 
         assertEquals("443", state.port)
         assertEquals(NetworkType.XHTTP.type, state.network)
