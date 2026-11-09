@@ -262,9 +262,7 @@ class ServerUiState(
         val configuredHost = host.trim()
         val domain = configuredSni.ifBlank {
             configuredHost.ifBlank {
-                currentAddress.takeUnless {
-                    it.contains(':') || IPV4_ADDRESS_PATTERN.matches(it)
-                }.orEmpty()
+                currentAddress.takeUnless(::isIpLiteral).orEmpty()
             }
         }
 
