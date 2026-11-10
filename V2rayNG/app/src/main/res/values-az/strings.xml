@@ -791,13 +791,4 @@
     <string name="sub_info_traffic" translatable="false">%1$s / %2$s</string>
     <string name="sub_info_unlimited">Limitsiz</string>
 
-    <string name="cf_scan_title">Cloudflare IP skanı</string>
-    <string name="cf_scan_sni_label">SNI / domen</string>
-    <string name="cf_scan_start">Skan et</string>
-    <string name="cf_scan_stop">Dayandır</string>
-    <string name="cf_scan_progress">%1$d / %2$d</string>
-    <string name="cf_scan_latency">%1$d ms</string>
-    <string name="cf_scan_empty">Heç bir ünvan cavab vermədi. SNI-nin bu profilin domeni olduğunu yoxlayıb yenidən skan edin.</string>
-    <string name="cf_scan_missing_sni">Əvvəlcə bu profilin SNI-sini daxil edin.</string>
-    <string name="cf_scan_no_candidates">Skan üçün ünvan yoxdur.</string>
 </resources>

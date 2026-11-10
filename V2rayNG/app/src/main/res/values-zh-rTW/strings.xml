@@ -788,13 +788,4 @@
     <string name="sub_info_open_page">開啟訂閱資訊頁面</string>
     <string name="sub_info_unlimited">無限制</string>
 
-    <string name="cf_scan_title">Cloudflare IP 掃描</string>
-    <string name="cf_scan_sni_label">SNI / 網域</string>
-    <string name="cf_scan_start">掃描</string>
-    <string name="cf_scan_stop">停止</string>
-    <string name="cf_scan_progress">%1$d / %2$d</string>
-    <string name="cf_scan_latency">%1$d 毫秒</string>
-    <string name="cf_scan_empty">沒有位址回應。請確認 SNI 是此設定的網域，然後重新掃描。</string>
-    <string name="cf_scan_missing_sni">請先填寫此設定的 SNI。</string>
-    <string name="cf_scan_no_candidates">沒有可掃描的位址。</string>
 </resources>

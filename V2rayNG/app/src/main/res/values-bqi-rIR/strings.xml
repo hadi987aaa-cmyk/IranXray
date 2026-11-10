@@ -790,13 +790,4 @@
     <string name="sub_info_open_page">واز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">بی‌حد</string>
 
-    <string name="cf_scan_title">اسکن IP کلادفلر</string>
-    <string name="cf_scan_sni_label">SNI / دامنه</string>
-    <string name="cf_scan_start">اسکن</string>
-    <string name="cf_scan_stop">توقف</string>
-    <string name="cf_scan_progress">%1$d از %2$d</string>
-    <string name="cf_scan_latency">%1$d میلی‌ثانیه</string>
-    <string name="cf_scan_empty">هیچ آدرسی پاسخ نداد. مطمئن شوید SNI همان دامنه‌ی این پروفایل است و دوباره اسکن کنید.</string>
-    <string name="cf_scan_missing_sni">ابتدا SNI این پروفایل را وارد کنید.</string>
-    <string name="cf_scan_no_candidates">آدرسی برای اسکن وجود ندارد.</string>
 </resources>

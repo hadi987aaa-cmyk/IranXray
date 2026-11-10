@@ -84,18 +84,6 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         }
     }
 
-    /**
-     * PattNG: the Cloudflare address scan the address field opens, see [CfScanViewModel].
-     *
-     * It lives on the activity rather than on the field, so a run survives a recomposition and
-     * stops with the screen.
-     */
-    private val cfScan: CfScanViewModel by viewModels {
-        viewModelFactory {
-            initializer { CfScanViewModel() }
-        }
-    }
-
     /** PattNG: the form once the profile it opens on is read, see [initialConfig]; until then, that the screen waits. */
     @Composable
     final override fun ScreenContent() {
@@ -145,7 +133,6 @@ abstract class BaseServerActivity : BaseComponentActivity() {
     protected fun CommonBasicFields(
         state: ServerUiState
     ) {
-        var scanning by rememberSaveable { mutableStateOf(false) }
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FormTextField(
                 label = stringResource(R.string.server_lab_remarks),
@@ -157,15 +144,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 label = stringResource(R.string.server_lab_address),
                 value = state.address,
                 onValueChange = { state.address = it },
-                isError = state.isAddressError,
-                trailingIcon = {
-                    IconButton(onClick = { scanning = true }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_scan_24dp),
-                            contentDescription = stringResource(R.string.cf_scan_title)
-                        )
-                    }
-                }
+                isError = state.isAddressError
             )
             FormTextField(
                 label = stringResource(R.string.server_lab_port),
@@ -173,24 +152,6 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 onValueChange = { state.port = it },
                 keyboardType = KeyboardType.Number,
                 isError = state.isPortError
-            )
-        }
-        if (scanning) {
-            val scanState by cfScan.state.collectAsStateWithLifecycle()
-            CfScanDialog(
-                initialSni = state.sni.ifBlank { state.host },
-                state = scanState,
-                onStart = { cfScan.start(it) },
-                onStop = { cfScan.stop() },
-                onPick = { result ->
-                    state.address = result.address
-                    state.port = result.port.toString()
-                    scanning = false
-                },
-                onDismiss = {
-                    cfScan.stop()
-                    scanning = false
-                }
             )
         }
     }

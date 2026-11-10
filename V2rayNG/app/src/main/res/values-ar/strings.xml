@@ -798,13 +798,4 @@
     <string name="sub_info_open_page">فتح صفحة معلومات الاشتراك</string>
     <string name="sub_info_unlimited">غير محدود</string>
 
-    <string name="cf_scan_title">فحص عناوين Cloudflare</string>
-    <string name="cf_scan_sni_label">SNI / النطاق</string>
-    <string name="cf_scan_start">فحص</string>
-    <string name="cf_scan_stop">إيقاف</string>
-    <string name="cf_scan_progress">%1$d / %2$d</string>
-    <string name="cf_scan_latency">%1$d مللي ثانية</string>
-    <string name="cf_scan_empty">لم يستجب أي عنوان. تأكد من أن SNI هو نطاق هذا الملف ثم أعد الفحص.</string>
-    <string name="cf_scan_missing_sni">أدخل SNI لهذا الملف أولاً.</string>
-    <string name="cf_scan_no_candidates">لا توجد عناوين للفحص.</string>
 </resources>
