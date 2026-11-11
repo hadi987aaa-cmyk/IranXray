@@ -711,7 +711,7 @@ object CoreOutboundBuilder {
             }
         }
         finalMask?.let {
-            val parsedFinalMask = JsonUtil.parseString(finalMask)
+            val parsedFinalMask = JsonUtil.parseString(IranMaskJitter.apply(finalMask))
             if (parsedFinalMask != null) {
                 streamSettings.finalmask = parsedFinalMask
             } else {
@@ -798,7 +798,7 @@ object CoreOutboundBuilder {
     /** [updateOutboundFinalMask] with the finalMask JSON itself, as the exit-node of an Aether core takes its profile's. */
     fun updateOutboundFinalMask(streamSettings: OutboundBean.StreamSettingsBean, finalMask: String?) {
         finalMask?.let {
-            val parsedFinalMask = JsonUtil.parseString(finalMask)
+            val parsedFinalMask = JsonUtil.parseString(IranMaskJitter.apply(finalMask))
             if (parsedFinalMask != null) {
                 streamSettings.finalmask = parsedFinalMask
             } else {

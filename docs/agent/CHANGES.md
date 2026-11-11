@@ -7,7 +7,7 @@ editing at the same time.
 ## Ground rules
 
 - **Branch:** `agent/iran-mode`, forked from `my-releases` at `e7a52cf`.
-- **Package id:** `com.iranxray.agent` (upstream `com.patterniha.pattng`) so it installs next to
+- **Package id:** `com.shaghali.app` (round 13; earlier rounds used `com.iranxray.agent`; upstream `com.patterniha.pattng`) so it installs next to
   PattNG and next to the `com.iranxray.client` build from the other branch.
 - **Own pipeline:** `.github/workflows/build-agent.yml` runs only on `agent/**` and on manual
   dispatch. The debug workflow that builds `iranxray/**` never triggers here, and vice versa.
@@ -279,3 +279,19 @@ The release asset names moved with the brand (`Shaghali_<version>_<abi>.apk`), a
 
 `Not run`: the icon was not observed on a launcher, and the dark palette was not compared on a
 device in this round.
+
+## Round 14: the preset no longer sends one fixed shape
+
+| File | Change |
+| --- | --- |
+| `core/IranMaskJitter.kt` | new: samples `times` 60-160, `delayMs` 18-45, `maxBytes` 8-28 KB for an untouched preset mask; leaves a hand-written mask, or one carrying `udp`/`quicParams`, alone |
+| `core/CoreOutboundBuilder.kt` | both places that apply a profile's `finalMask` now pass it through `IranMaskJitter.apply(...)` |
+| `test/.../core/IranMaskJitterTest.kt` | 6 tests: presets recognised, sampled values in range, seeded determinism, hand-written mask untouched, udp mask untouched, blank/unreadable untouched |
+
+Why: every profile that presses the one-tap Iran preset used to send the identical merge shape
+(`times` 100, `delayMs` 30, `maxBytes` 16384), so a filter rule written against that exact shape
+would burn every user at once. The sampled shape keeps the batching that defeats packet-boundary DPI
+while removing the shared constant.
+
+`Not run`: nothing was captured on a device or a server, so the effect on a real DPR is unproven;
+the ranges are a reasoned envelope, not a measured distribution.
