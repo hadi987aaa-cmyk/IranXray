@@ -808,4 +808,7 @@
     <string name="preset_setting_final_mask">finalMask</string>
     <string name="server_lab_target_strategy">targetStrategy</string>
     <string name="sub_info_traffic">%1$s / %2$s</string>
+    <string name="title_diagnostics">Копировать диагностику</string>
+    <string name="summary_diagnostics">Версия, ядро, режим и DNS для сообщения о проблеме</string>
+    <string name="toast_diagnostics_copied">Диагностика скопирована</string>
 </resources>

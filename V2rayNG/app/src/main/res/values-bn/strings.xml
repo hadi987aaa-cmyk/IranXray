@@ -804,4 +804,7 @@
     <string name="preset_setting_final_mask">finalMask</string>
     <string name="server_lab_target_strategy">targetStrategy</string>
     <string name="sub_info_traffic">%1$s / %2$s</string>
+    <string name="title_diagnostics">ডায়াগনস্টিকস কপি করুন</string>
+    <string name="summary_diagnostics">সমস্যার প্রতিবেদনের জন্য সংস্করণ, কোর, মোড ও DNS</string>
+    <string name="toast_diagnostics_copied">ডায়াগনস্টিকস কপি হয়েছে</string>
 </resources>

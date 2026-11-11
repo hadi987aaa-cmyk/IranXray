@@ -802,4 +802,7 @@
     <string name="preset_setting_final_mask">finalMask</string>
     <string name="server_lab_target_strategy">targetStrategy</string>
     <string name="sub_info_traffic">%1$s / %2$s</string>
+    <string name="title_diagnostics">Sao chép chẩn đoán</string>
+    <string name="summary_diagnostics">Phiên bản, lõi, chế độ và DNS để báo lỗi</string>
+    <string name="toast_diagnostics_copied">Đã sao chép chẩn đoán</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.v2ray.ang.ui
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.webkit.WebView
 import androidx.compose.foundation.layout.Column
@@ -22,15 +23,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.core.CoreNativeManager
+import com.v2ray.ang.core.DiagnosticsReport
+import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.ui.base.BaseComponentActivity
 import com.v2ray.ang.ui.compose.AppTopBar
 import com.v2ray.ang.ui.compose.NavigationBarsSpacer
@@ -40,13 +47,36 @@ import com.v2ray.ang.util.Utils
 
 class AboutActivity : BaseComponentActivity() {
 
+    /**
+     * Assembled here, not in the composable: the UI layer must not read settings or storage.
+     * The text changes only when the activity is recreated, which is enough for a report.
+     */
+    private lateinit var diagnostics: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        diagnostics = DiagnosticsReport.build(
+            appVersion = BuildConfig.VERSION_NAME,
+            libVersion = CoreNativeManager.getLibVersion(),
+            cores = BuildConfig.CORES,
+            androidVersion = Build.VERSION.RELEASE ?: "-",
+            sdkInt = Build.VERSION.SDK_INT,
+            mode = when {
+                SettingsManager.isRootMode() -> "root"
+                SettingsManager.isVpnMode() -> "vpn"
+                else -> "proxy"
+            },
+            socksPort = SettingsManager.getSocksPort(),
+            remoteDns = SettingsManager.getRemoteDnsServers(),
+            routingRulesets = MmkvManager.decodeRoutingRulesets()?.size ?: 0,
+            delayTestUrl = SettingsManager.getDelayTestUrl()
+        )
     }
 
     @Composable
     override fun ScreenContent() {
         AboutScreen(
+            diagnostics = diagnostics,
             onBackClick = { finish() },
             onTranslatorsClick = {
                 startActivity(Intent(this, TranslatorsActivity::class.java))
@@ -57,10 +87,12 @@ class AboutActivity : BaseComponentActivity() {
 
 @Composable
 fun AboutScreen(
+    diagnostics: String,
     onBackClick: () -> Unit,
     onTranslatorsClick: () -> Unit
 ) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     var showOssDialog by remember { mutableStateOf(false) }
 
     val libVersion = CoreNativeManager.getLibVersion()
@@ -109,6 +141,15 @@ fun AboutScreen(
                 icon = painterResource(R.drawable.ic_feedback_24dp),
                 title = stringResource(R.string.title_pref_feedback),
                 onClick = { Utils.openUri(context, AppConfig.APP_ISSUES_URL) }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_copy),
+                title = stringResource(R.string.title_diagnostics),
+                subtitle = stringResource(R.string.summary_diagnostics),
+                onClick = {
+                    clipboard.setText(AnnotatedString(diagnostics))
+                    context.toastSuccess(R.string.toast_diagnostics_copied)
+                }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_privacy_24dp),

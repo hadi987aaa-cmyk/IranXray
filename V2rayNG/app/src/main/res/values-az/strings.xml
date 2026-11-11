@@ -804,4 +804,7 @@
     <string name="preset_setting_dial_mode">dialMode</string>
     <string name="preset_setting_final_mask">finalMask</string>
     <string name="server_lab_target_strategy">targetStrategy</string>
+    <string name="title_diagnostics">Diaqnostikanı kopyala</string>
+    <string name="summary_diagnostics">Problem üçün versiya, nüvə, rejim və DNS</string>
+    <string name="toast_diagnostics_copied">Diaqnostika kopyalandı</string>
 </resources>

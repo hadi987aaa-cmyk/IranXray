@@ -802,4 +802,7 @@
     <string name="preset_setting_final_mask">finalMask</string>
     <string name="server_lab_target_strategy">targetStrategy</string>
     <string name="sub_info_traffic">%1$s / %2$s</string>
+    <string name="title_diagnostics">复制诊断信息</string>
+    <string name="summary_diagnostics">版本、内核、模式与 DNS，用于问题反馈</string>
+    <string name="toast_diagnostics_copied">已复制诊断信息</string>
 </resources>

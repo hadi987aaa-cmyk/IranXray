@@ -805,4 +805,7 @@
     <string name="server_preset_iran_hint">Chrome fingerprint, merge mask and OOB dial: the settings that survive Iranian filtering.</string>
 
     <string name="toast_aether_not_packaged">This build does not include the Aether core. Install the full build to use this profile.</string>
+    <string name="title_diagnostics">Copy diagnostics</string>
+    <string name="summary_diagnostics">Version, cores, mode and DNS for a support request</string>
+    <string name="toast_diagnostics_copied">Diagnostics copied</string>
 </resources>

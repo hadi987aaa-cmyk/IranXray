@@ -804,4 +804,7 @@
     <string name="preset_setting_final_mask">finalMask</string>
     <string name="server_lab_target_strategy">targetStrategy</string>
     <string name="sub_info_traffic">%1$s / %2$s</string>
+    <string name="title_diagnostics">کپی اطلاعات تشخیصی</string>
+    <string name="summary_diagnostics">نسخه، هسته، حالت و DNS برای گزارش مشکل</string>
+    <string name="toast_diagnostics_copied">اطلاعات تشخیصی کپی شد</string>
 </resources>

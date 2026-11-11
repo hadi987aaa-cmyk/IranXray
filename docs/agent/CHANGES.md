@@ -194,3 +194,22 @@ Checked against a local build of 0.8.0 first: 18 referenced codes, 17 present, `
 missing — the same one this change removes.
 
 `Not run`: the black preset was not selected on a device in this round.
+## Round 10: one tap copies a diagnostics summary
+
+When the connection misbehaves on a phone, the only thing the user can send is "it does not work".
+The About screen now has a "Copy diagnostics" row that puts a short, paste-safe summary on the
+clipboard: app version, Xray library version, the cores this build carries, Android version,
+the running mode, the SOCKS port, the remote DNS servers, how many routing rulesets are stored
+and the delay-test URL.
+
+It deliberately contains no server address, port, UUID, password or subscription URL, so the
+text can be pasted into a public issue.
+
+| File | Change |
+|---|---|
+| ``core/DiagnosticsReport.kt`` | new: pure builder for the report text, no Android imports so it is JVM-testable |
+| ``ui/AboutActivity.kt`` | the report is assembled in the activity (the UI layer must not read settings or storage), passed into ``AboutScreen``, and copied with ``LocalClipboardManager`` plus a toast |
+| ``res/values*/strings.xml`` | three new strings (row title, subtitle, toast) in all ten locales |
+| ``test/.../core/DiagnosticsReportTest.kt`` | new: exact line layout, no trailing blank line, empty DNS prints ``-``, several servers stay on one line, and no share-link scheme or credential ever appears |
+
+``Not run``: the clipboard copy and the toast were not exercised on a device in this round.

@@ -812,4 +812,7 @@
     <string name="preset_setting_final_mask">finalMask</string>
     <string name="server_lab_target_strategy">targetStrategy</string>
     <string name="sub_info_traffic">%1$s / %2$s</string>
+    <string name="title_diagnostics">نسخ المعلومات التشخيصية</string>
+    <string name="summary_diagnostics">الإصدار والنواة والوضع وDNS لتقرير المشكلة</string>
+    <string name="toast_diagnostics_copied">تم نسخ المعلومات التشخيصية</string>
 </resources>
