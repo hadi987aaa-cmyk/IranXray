@@ -25,7 +25,7 @@ class DiagnosticsReportTest {
     fun `report lists every setting on its own line`() {
         assertEquals(
             listOf(
-                "IranXray 0.10.0 (Xray 26.11.1, cores lite)",
+                "Shaghali 0.10.0 (Xray 26.11.1, cores lite)",
                 "Android 13 (SDK 33)",
                 "Mode: vpn",
                 "SOCKS port: 10808",

@@ -10,7 +10,7 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.iranxray.agent"
+        applicationId = "com.shaghali.app"
         minSdk = 29
         targetSdk = 37
         versionCode = 755
@@ -109,7 +109,7 @@ android {
                     // PattNG: GitHub lists a release's files by name, and a version starts with a digit, which sorts
                     // before "fdroid": the F-Droid files come after the others. The app's update check finds its file
                     // by "fdroid" and the ABI anywhere in the name, see UpdateCheckerManager.getDownloadUrl.
-                    output.outputFileName = "IranXray_fdroid_${variant.versionName}_${abi}.apk"
+                    output.outputFileName = "Shaghali_fdroid_${variant.versionName}_${abi}.apk"
                     if (versionCodes.containsKey(abi)) {
                         output.versionCodeOverride =
                             (100 * variant.versionCode + versionCodes[abi]!!).plus(5000000)
@@ -129,7 +129,7 @@ android {
                     else
                         "universal"
 
-                    output.outputFileName = "IranXray_${variant.versionName}_${abi}.apk"
+                    output.outputFileName = "Shaghali_${variant.versionName}_${abi}.apk"
                     if (versionCodes.containsKey(abi)) {
                         output.versionCodeOverride =
                             (1000000 * versionCodes[abi]!!).plus(variant.versionCode)

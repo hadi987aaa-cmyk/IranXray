@@ -19,7 +19,7 @@ object DiagnosticsReport {
         routingRulesets: Int,
         delayTestUrl: String,
     ): String = buildString {
-        appendLine("IranXray $appVersion (Xray $libVersion, cores $cores)")
+        appendLine("Shaghali $appVersion (Xray $libVersion, cores $cores)")
         appendLine("Android $androidVersion (SDK $sdkInt)")
         appendLine("Mode: $mode")
         appendLine("SOCKS port: $socksPort")

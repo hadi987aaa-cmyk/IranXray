@@ -14,8 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object UpdateCheckerManager {
-    /** The app version inside an asset name such as `IranXray_0.6.0_arm64-v8a.apk`. */
-    private val ASSET_VERSION = Regex("""IranXray_(\d+(?:\.\d+)*)_""")
+    /** The app version inside an asset name such as `Shaghali_0.6.0_arm64-v8a.apk`. */
+    private val ASSET_VERSION = Regex("""Shaghali_(\d+(?:\.\d+)*)_""")
 
     /** A dotted numeric version, the only shape [compareVersions] can order. */
     private val NUMERIC_VERSION = Regex("""\d+(\.\d+)*""")

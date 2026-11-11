@@ -9,7 +9,7 @@ class UpdateCheckerManagerTest {
 
     @Test
     fun readsTheVersionOutOfTheAgentAssetName() {
-        val version = UpdateCheckerManager.releaseVersion("agent-20", listOf("IranXray_0.6.0_arm64-v8a.apk"))
+        val version = UpdateCheckerManager.releaseVersion("agent-20", listOf("Shaghali_0.6.0_arm64-v8a.apk"))
 
         assertEquals("0.6.0", version)
     }
@@ -18,7 +18,7 @@ class UpdateCheckerManagerTest {
     fun readsTheVersionFromTheSecondAssetWhenTheFirstHasNone() {
         val version = UpdateCheckerManager.releaseVersion(
             "agent-20",
-            listOf("release-notes.txt", "IranXray_0.5.0_armeabi-v7a.apk")
+            listOf("release-notes.txt", "Shaghali_0.5.0_armeabi-v7a.apk")
         )
 
         assertEquals("0.5.0", version)
@@ -45,7 +45,7 @@ class UpdateCheckerManagerTest {
 
     @Test
     fun theNewestBuildOfTheInstalledVersionIsNotAnUpdate() {
-        val latest = UpdateCheckerManager.releaseVersion("agent-20", listOf("IranXray_0.5.0_arm64-v8a.apk"))
+        val latest = UpdateCheckerManager.releaseVersion("agent-20", listOf("Shaghali_0.5.0_arm64-v8a.apk"))
 
         assertEquals(0, UpdateCheckerManager.compareVersions(latest!!, "0.5.0"))
     }

@@ -331,20 +331,20 @@ jobs:
           import xml.etree.ElementTree as ET
 
           res = "V2rayNG/app/src/main/res"
-          brand = "PattNG"
+          brands = ("PattNG", "IranXray")
           bad = False
           for path in sorted(glob.glob(os.path.join(res, "values*", "strings.xml"))):
               for element in ET.parse(path).getroot():
-                  if brand in "".join(element.itertext()):
+                  if any(b in "".join(element.itertext()) for b in brands):
                       bad = True
-                      print("::error file=%s::%s still names %s" % (path, element.get("name"), brand))
+                      print("::error file=%s::%s still names a retired brand" % (path, element.get("name")))
           sys.exit(1 if bad else 0)
           PY
 
       - name: Upload the APK
         uses: actions/upload-artifact@v7
         with:
-          name: IranXray-${{ env.CORES }}-${{ env.ABI_FILTERS }}-${{ github.run_number }}
+          name: Shaghali-${{ env.CORES }}-${{ env.ABI_FILTERS }}-${{ github.run_number }}
           path: ${{ env.APK_DIR }}/*.apk
           if-no-files-found: error
           retention-days: 14
@@ -353,7 +353,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: agent-${{ github.run_number }}
-          name: IranXray ${{ env.CORES }} build ${{ github.run_number }}
+          name: Shaghali ${{ env.CORES }} build ${{ github.run_number }}
           body: |
             Cores: `${{ env.CORES }}`, Minify: `${{ env.MINIFY }}`
             Version: `${{ env.VERSION_NAME }}`

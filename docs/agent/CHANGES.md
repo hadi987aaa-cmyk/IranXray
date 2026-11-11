@@ -250,3 +250,32 @@ treated as "no lookup". `IPAPIInfo` gained the `cc` field that myip.com uses for
 | ``test/.../handler/SpeedtestManagerTest.kt`` | new: order, blank setting, de-duplication, trimming, the historical default first, and parsing of the myip/ipinfo JSON shapes |
 
 ``Not run``: the notification text was not observed on a device in this round.
+## Round 13: the app is now called Shaghali
+
+The name, the icon and the palette were still rented from upstream and from my own earlier
+placeholder. This round gives the app its own identity end to end - launcher label, notification
+channel, adaptive icon (background, foreground, monochrome), legacy icon and round icon at five
+densities, the TV banner, the Compose colour schemes and the window background.
+
+Because the identity is the package name for Android, `applicationId` moved to
+`com.shaghali.app`. That is a **new install**: the old `com.iranxray.agent` stays where it is,
+so a working profile can be kept until the new build is verified, but settings and profiles do not
+migrate between the two.
+
+The release asset names moved with the brand (`Shaghali_<version>_<abi>.apk`), and
+`UpdateCheckerManager` parses that prefix, so the in-app update check keeps working.
+
+| File | Change |
+|---|---|
+| `app/build.gradle.kts` | `applicationId = "com.shaghali.app"`; output names `Shaghali_*` / `Shaghali_fdroid_*` |
+| `res/mipmap-*/` | new `ic_launcher`, `ic_launcher_round`, `ic_launcher_bg`, `ic_launcher_foreground`, `ic_launcher_monochrome` at mdpi..xxxhdpi; new `ic_banner` / `ic_banner_foreground` (320x180) |
+| `res/values/ic_banner_background.xml` | banner background `#17123A` instead of white |
+| `res/values*/strings.xml` | `app_name` and `notification_channel_service` now say Shaghali in all ten locales |
+| `ui/compose/Theme.kt` | indigo/emerald/cyan colour schemes for light and dark, new semantic colours |
+| `res/values/themes.xml` | window background `#FBFAFF` light / `#0B0A14` dark |
+| `handler/UpdateCheckerManager.kt` | asset-version regex `Shaghali_(\d+(?:\.\d+)*)_` |
+| `core/DiagnosticsReport.kt` | the copied summary starts with `Shaghali <version>` |
+| `.github/workflows/build-agent.yml` | artifact/release names `Shaghali-*`; the resource brand guard now rejects `PattNG` **and** `IranXray` |
+
+`Not run`: the icon was not observed on a launcher, and the dark palette was not compared on a
+device in this round.
