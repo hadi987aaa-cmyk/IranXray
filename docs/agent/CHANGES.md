@@ -157,3 +157,22 @@ while only the English/default resource said `IranXray`.
 | `.github/workflows/build-agent.yml` | the locale-parity check now ignores `translatable="false"` keys, and a new check fails the build when `PattNG` survives anywhere under `res/values*/` |
 
 `Not run`: the launcher label and the notification channel were not looked at on a device.
+
+## Round 8: the help and policy links belong to this fork
+
+The About screen still had three rented links. "Telegram channel" opened `t.me/github_2dust`,
+the upstream author's channel; the privacy policy was fetched from `2dust/v2rayNG`; and the
+settings screen's "mode help" opened `$APP_URL/wiki/Mode`, a wiki the fork does not have, so the
+tap landed on a 404.
+
+| File | Change |
+|---|---|
+| `AppConfig.kt` | `APP_DOCS_URL` added; `APP_WIKI_MODE` and `APP_PRIVACY_POLICY` point at this repository's own documents; `TG_CHANNEL_URL` and the dead `APP_PROMOTION_URL` removed |
+| `ui/AboutActivity.kt` | the Telegram row removed — the fork has no channel to send anyone to |
+| `docs/PRIVACY.md` | new: what is stored locally, what leaves the device, permissions, third-party cores |
+| `docs/MODE.md` | new: VPN, proxy-only and root modes, what each one intercepts, and the notes that matter on Iranian networks |
+
+The document links carry the branch name (`blob/agent/iran-mode/docs`) because the files only
+exist here; both paths have to move when this branch is merged.
+
+`Not run`: the About screen and the mode-help tap were not exercised on a device in this round.
