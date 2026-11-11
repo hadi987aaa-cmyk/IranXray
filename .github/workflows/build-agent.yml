@@ -276,8 +276,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          file="$(find V2rayNG/app/build/generated/source/buildConfig -name BuildConfig.java -print -quit)"
-          if [ -z "$file" ]; then echo "::error::no generated BuildConfig.java was found"; exit 1; fi
+          # The variant that ships: the debug tree also has a BuildConfig, generated for the unit
+          # tests without the property, so searching the whole tree would read the wrong one.
+          build_type="$(basename "$APK_DIR")"
+          file="$(find "V2rayNG/app/build/generated/source/buildConfig/playstore/$build_type" -name BuildConfig.java -print -quit)"
+          if [ -z "$file" ]; then echo "::error::no generated BuildConfig.java for $build_type"; exit 1; fi
           echo "generated: $file"
           grep -n "CORES" "$file" || true
           if ! grep -qF "public static final String CORES = \"$CORES\";" "$file"; then
