@@ -151,8 +151,8 @@ object AppConfig {
     const val GITHUB_RAW_URL = "https://raw.githubusercontent.com"
     const val GITHUB_DOWNLOAD_URL = "$GITHUB_URL/%s/releases/latest/download"
     const val ANDROID_PACKAGE_NAME_LIST_URL = "$GITHUB_RAW_URL/2dust/androidpackagenamelist/master/proxy.txt"
-    const val APP_URL = "$GITHUB_URL/patterniha/PattNG"
-    const val APP_API_URL = "https://api.github.com/repos/patterniha/PattNG/releases"
+    const val APP_URL = "$GITHUB_URL/hadi987aaa-cmyk/IranXray"
+    const val APP_API_URL = "https://api.github.com/repos/hadi987aaa-cmyk/IranXray/releases"
     const val APP_ISSUES_URL = "$APP_URL/issues"
     const val AETHER_URL = "$GITHUB_URL/CluvexStudio/aether"
     const val APP_WIKI_MODE = "$APP_URL/wiki/Mode"
@@ -160,8 +160,8 @@ object AppConfig {
     const val APP_PROMOTION_URL = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
     const val TG_CHANNEL_URL = "https://t.me/github_2dust"
     // gstatic and google are blocked in Iran, which made every latency test report a timeout.
-// Both targets below answer a plain GET from an Iranian mobile network.
-const val DELAY_TEST_URL = "https://www.bing.com"
+    // Both targets below answer a plain GET from an Iranian mobile network.
+    const val DELAY_TEST_URL = "https://www.bing.com"
     const val DELAY_TEST_URL2 = "https://www.wikipedia.org"
     const val OBSERVATORY_LEAST_PING_INTERVAL = "3m"
     const val OBSERVATORY_LEAST_LOAD_INTERVAL = "5m"

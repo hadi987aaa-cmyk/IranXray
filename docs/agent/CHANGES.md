@@ -126,3 +126,19 @@ back to English on that phone. `AppConfig.APP_PROMOTION_URL` itself is left in p
 it any more.
 
 `Not run`: the drawer was not looked at on a device in this round.
+
+## Round 6: the built-in update check looks at this repository
+
+The drawer's "check for update" asked `patterniha/PattNG` for its newest release, so it would have
+offered an upstream APK: a different signing key, so the install fails, and a version numbering
+that has nothing to do with this fork. Pointing it here alone would not have been enough either —
+builds are tagged `agent-<run number>`, and `agent-20` orders above `0.5.0`, so every run would
+have looked like an update for ever.
+
+| File | Change |
+|---|---|
+| `AppConfig.kt` | `APP_URL` and `APP_API_URL` point at `hadi987aaa-cmyk/IranXray`; the round-1 delay-test constants get their indentation back |
+| `handler/UpdateCheckerManager.kt` | `releaseVersion()` reads the app version out of the asset name (`IranXray_<version>_<abi>.apk`) and falls back to a numeric `v<version>` tag; a release carrying neither is not offered, instead of nagging with an unorderable tag; `compareVersions` is `internal` so the test can reach it |
+| `test/.../handler/UpdateCheckerManagerTest.kt` | new: the asset name wins over the tag, unorderable tags are refused, `0.10.0 > 0.9.0`, and the newest build of the installed version is not an update |
+
+`Not run`: the dialog was not opened on a device in this round.

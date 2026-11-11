@@ -14,6 +14,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object UpdateCheckerManager {
+    /** The app version inside an asset name such as `IranXray_0.6.0_arm64-v8a.apk`. */
+    private val ASSET_VERSION = Regex("""IranXray_(\d+(?:\.\d+)*)_""")
+
+    /** A dotted numeric version, the only shape [compareVersions] can order. */
+    private val NUMERIC_VERSION = Regex("""\d+(\.\d+)*""")
+
     suspend fun checkForUpdate(includePreRelease: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
         val url = if (includePreRelease) {
             AppConfig.APP_API_URL
@@ -55,7 +61,16 @@ object UpdateCheckerManager {
             return@withContext CheckUpdateResult(hasUpdate = false)
         }
 
-        val latestVersion = latestRelease.tagName.removePrefix("v")
+        val latestVersion = releaseVersion(latestRelease.tagName, latestRelease.assets.map { it.name })
+        if (latestVersion == null) {
+            // A release we cannot order against the installed version must not be offered: an
+            // unorderable tag compared as if it were newer would nag the user forever.
+            LogUtil.i(
+                AppConfig.TAG,
+                "Release ${latestRelease.tagName} carries no app version; skipping the update check"
+            )
+            return@withContext CheckUpdateResult(hasUpdate = false)
+        }
         LogUtil.i(
             AppConfig.TAG,
             "Found new version: $latestVersion (current: ${BuildConfig.VERSION_NAME})"
@@ -75,7 +90,22 @@ object UpdateCheckerManager {
         }
     }
 
-    private fun compareVersions(version1: String, version2: String): Int {
+    /**
+     * The app version a release stands for.
+     *
+     * Builds are tagged `agent-<run number>`, one per CI run, so the tag says nothing about the
+     * app version; the APK name does. A repository that publishes `v<version>` tags keeps working
+     * through the tag fallback.
+     */
+    internal fun releaseVersion(tagName: String, assetNames: List<String>): String? {
+        assetNames.firstNotNullOfOrNull { ASSET_VERSION.find(it)?.groupValues?.get(1) }
+            ?.let { return it }
+
+        val fromTag = tagName.removePrefix("v")
+        return if (NUMERIC_VERSION.matches(fromTag)) fromTag else null
+    }
+
+    internal fun compareVersions(version1: String, version2: String): Int {
         // Compare all numeric segments so suffixed tags like "2.3.2-P1" work:
         // "2.3.2-P1" -> [2,3,2,1], "2.3.2" -> [2,3,2], "2.3.2-P2" > "2.3.2-P1" > "2.3.2"
         val numberRegex = Regex("\\d+")
