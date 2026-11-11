@@ -2,7 +2,6 @@ package com.v2ray.ang.core
 
 import com.google.gson.JsonObject
 import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.LogUtil
 import kotlin.random.Random
 
 /**
@@ -15,8 +14,6 @@ import kotlin.random.Random
  * its numbers are a deliberate choice, and so is a mask that carries `udp` or `quicParams` rules we do not sample.
  */
 object IranMaskJitter {
-
-    private const val TAG = "IranMaskJitter"
 
     const val PRESET_TIMES = 100
     const val PRESET_DELAY_MS = 30
@@ -50,11 +47,11 @@ object IranMaskJitter {
     /** The parsed root of [mask] only when it is exactly the untouched preset; null otherwise. */
     private fun presetRoot(mask: String?): JsonObject? {
         if (mask.isNullOrBlank()) return null
-        // Gson throws on text that is not JSON at all, and a profile can carry anything a user pasted.
+        // JsonUtil.parseString already swallows parse errors, but a profile can carry anything a user pasted
+        // and its error path reaches the platform logger, which unit tests cannot touch, so guard the call too.
         val root = try {
             JsonUtil.parseString(mask)
         } catch (e: RuntimeException) {
-            LogUtil.w(TAG, "finalMask is not JSON, leaving it untouched: ${e.message}")
             null
         } ?: return null
         if (root.has("udp") || root.has("quicParams")) return null
