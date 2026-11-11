@@ -40,7 +40,13 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 and resource shrinking are opt-in per build: the app leans on reflection
+            // (Gson models, MMKV) and on fixed JNI names (the service package the native
+            // tunnel calls back into), so the switch is kept next to the rules it needs and
+            // a regression can be reverted by the next build without a code change.
+            val minify = (project.findProperty("iranXrayMinify") as? String)?.toBoolean() ?: false
+            isMinifyEnabled = minify
+            isShrinkResources = minify
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

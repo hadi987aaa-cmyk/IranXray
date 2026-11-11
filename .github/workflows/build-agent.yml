@@ -30,6 +30,11 @@ on:
           - lite
           - all
         default: lite
+      minify:
+        description: Shrink the APK with R8 (experimental)
+        required: false
+        type: boolean
+        default: true
   push:
     branches:
       - 'agent/**'
@@ -53,6 +58,7 @@ jobs:
       # `lite` keeps only the cores a direct VLESS+REALITY profile needs, which removes
       # roughly 54 MB of native payload. `all` restores Aether, Psiphon and Tor.
       CORES: ${{ inputs.cores || 'lite' }}
+      MINIFY: ${{ inputs.minify || 'false' }}
       # An unset secret evaluates to an empty string, which the restore step keys on.
       DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
       RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
@@ -243,6 +249,7 @@ jobs:
             printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
             ./gradlew --no-daemon :app:assemblePlaystoreRelease \
               -PiranXrayVersion="$VERSION_NAME" \
+              -PiranXrayMinify="$MINIFY" \
               -PABI_FILTERS="$ABI_FILTERS" \
               -Pandroid.injected.signing.store.file="$RUNNER_TEMP/release.jks" \
               -Pandroid.injected.signing.store.password="Cloak1405Iran" \
@@ -252,6 +259,7 @@ jobs:
           else
             ./gradlew --no-daemon :app:assemblePlaystoreDebug \
               -PiranXrayVersion="$VERSION_NAME" \
+              -PiranXrayMinify="$MINIFY" \
               -PABI_FILTERS="$ABI_FILTERS"
             echo "APK_DIR=V2rayNG/app/build/outputs/apk/playstore/debug" >> "$GITHUB_ENV"
           fi
@@ -270,7 +278,7 @@ jobs:
           tag_name: agent-${{ github.run_number }}
           name: IranXray ${{ env.CORES }} build ${{ github.run_number }}
           body: |
-            Cores: `${{ env.CORES }}`
+            Cores: `${{ env.CORES }}`, Minify: `${{ env.MINIFY }}`
             Version: `${{ env.VERSION_NAME }}`
             Signing: `${{ env.RELEASE_KEYSTORE_BASE64 != '' && 'release (stable key)' || 'debug' }}`
             Commit: `${{ github.sha }}`
