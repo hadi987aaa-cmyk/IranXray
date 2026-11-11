@@ -129,7 +129,6 @@
     "remarks": "代理GFW",
     "outboundTag": "proxy",
     "domain": [
-      "geosite:gfw",
       "geosite:greatfire"
     ]
   },

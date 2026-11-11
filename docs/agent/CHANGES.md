@@ -176,3 +176,21 @@ The document links carry the branch name (`blob/agent/iran-mode/docs`) because t
 exist here; both paths have to move when this branch is merged.
 
 `Not run`: the About screen and the mode-help tap were not exercised on a device in this round.
+
+## Round 9: the routing presets only reference codes that exist
+
+Xray drops a routing rule whose `geosite:`/`geoip:` code is not in the packaged database, and
+says so only in its own log. The APK therefore shipped one dead rule: `custom_routing_black`
+asked for `geosite:gfw`, a category the bundled Iran-oriented geosite does not carry, so the
+"proxy the blocked sites" rule of that preset matched nothing but `geosite:greatfire`.
+
+| File | Change |
+|---|---|
+| `assets/custom_routing_black` | `geosite:gfw` removed from the blocked-sites rule; `geosite:greatfire` already carries that list in the bundled database |
+| `scripts/agent/check_routing_codes.py` | new: reads the codes out of `assets/geosite.dat` and `assets/geoip.dat` inside the built APK and compares them with every code the packaged `assets/custom_routing_*` files reference |
+| `.github/workflows/build-agent.yml` | new step "Verify the routing presets only use codes the databases carry", after the release is published so a broken preset cannot cost a working APK |
+
+Checked against a local build of 0.8.0 first: 18 referenced codes, 17 present, `geosite:gfw`
+missing — the same one this change removes.
+
+`Not run`: the black preset was not selected on a device in this round.

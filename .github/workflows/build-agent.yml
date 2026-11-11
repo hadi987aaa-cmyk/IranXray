@@ -386,3 +386,7 @@ jobs:
           if [ -n "$APKSIGNER" ]; then
             "$APKSIGNER" verify --print-certs "$APK" | head -n 5 || true
           fi
+      - name: Verify the routing presets only use codes the databases carry
+        run: |
+          APK="$(find "${{ env.APK_DIR }}" -name '*.apk' | head -n 1)"
+          python3 scripts/agent/check_routing_codes.py "$APK"
