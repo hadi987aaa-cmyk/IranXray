@@ -32,32 +32,54 @@ Cloudflare orange cloud** (proxied DNS), because Iran's filtering now restricts 
 severely. Anything that improves that path — TCP write masking, first-packet obfuscation,
 ClientHello fragmentation, clean-edge scanning, XHTTP padding — ranks above other features.
 
-## Feature: Cloudflare address scan
+## Removed: Cloudflare address scan
 
-A profile fronted by Cloudflare keeps its own domain as Host/SNI, but the anycast address it
-points at can be throttled or blocked. The address field of the server editor now carries a scan
-action that probes candidate Cloudflare edge addresses, each with the profile's own SNI, and
-writes the fastest one that completes a TLS handshake into the address and port fields.
+The scan feature (commit `012ed4e`) was withdrawn at the user's request: he wants the client to
+stay lean and the address field simple. `BaseServerActivity.kt` and the ten `res/values*/strings.xml`
+were restored from base `e7a52cf`, and `core/CfIpScanner.kt`, `core/CfScanRunner.kt`,
+`ui/server/CfScanViewModel.kt`, `ui/server/CfScanDialog.kt` and their two tests were deleted in one
+commit. Only the settings a profile needs remained.
+
+## Round 1: lite builds (release `agent-10`)
+
+The measured APK was 76.4 MB, of which ~54 MB was three optional native cores that this user never
+selects: `libpsiphon-tunnel-core.so` 20.9 MB, `libaether.so` 18.0 MB, `liblyrebird.so` 15.5 MB.
 
 | File | Change |
 |---|---|
-| `core/CfIpScanner.kt` | new — CIDR → candidate addresses, TLS handshake probe with a given SNI, bounded-concurrency scan returning the successful endpoints fastest first |
-| `core/CfScanRunner.kt` | new — the runner interface the view model depends on, plus its network implementation |
-| `ui/server/CfScanViewModel.kt` | new — scan state (`running`, `done`, `total`, `results`, `problem`) as `StateFlow`; refuses a blank SNI, replaces a running scan, keeps the previous results until the new run finishes |
-| `ui/server/CfScanDialog.kt` | new — the dialog: SNI field, progress, result rows, Scan/Stop |
-| `ui/server/BaseServerActivity.kt` | address field gets the scan action and hosts the dialog; picking a result fills address and port |
-| `res/values*/strings.xml` (10 locales) | nine `cf_scan_*` strings, translated for every locale in `localeFilters` |
-| `test/.../core/CfIpScannerTest.kt` | new — candidate count, range containment, determinism, invalid CIDR handling, CIDR parsing and IP formatting |
-| `test/.../ui/server/CfScanViewModelTest.kt` | new — idle state, blank SNI refusal, no-candidate problem, progress and results, running until the runner returns, stop, runner failure |
+| `.github/workflows/build-agent.yml` | `cores` choice input (`lite` default, `all` opt-in); the Aether/Psiphon/Tor Rust-Go steps, their caches and the Psiphon server list run only for `all`; staging copies `libs/` always and the optional cores only for `all` |
+| `V2rayNG/app/src/main/java/com/v2ray/ang/AppConfig.kt` | `DELAY_TEST_URL` `https://www.gstatic.com/generate_204` -> `https://www.bing.com`; `DELAY_TEST_URL2` `https://www.google.com/generate_204` -> `https://www.wikipedia.org` (both old hosts are blocked in Iran, so every latency test reported a timeout) |
 
-Why a TLS handshake is the test: the probe has to reuse the profile's real SNI, because what
-Iranian filtering blocks is often the name (or the handshake shape), not the address. A probe to
-`https://<ip>` with a mismatched name would report success for endpoints the profile still cannot
-use. `endpointIdentificationAlgorithm` is cleared so a valid certificate for another name does
-not fail the probe; the dialog's job is reachability of this SNI through this address, not
-certificate validation, which the core still performs when the profile connects.
+Result: 53,731,247 B (51.2 MiB). Startup is unaffected because the only `System.loadLibrary` in the
+app is `TProxyService.kt:39` `System.loadLibrary("hev-socks5-tunnel")`; the optional cores are
+launched as child processes and are only reached when a profile selects them.
 
-Not verified: the dialog was never rendered on a device or emulator, so its layout at large font
-scales, its IME behaviour and its TalkBack labels are unverified. `Not run` for the semantics,
-focus-order and IME checks that `ui/AGENTS.md` requires.
+## Round 2: R8 (release `agent-12`)
 
+`isMinifyEnabled` and `isShrinkResources` were hard-coded `false`, which left 33.9 MB of dex.
+
+| File | Change |
+|---|---|
+| `V2rayNG/app/build.gradle.kts` | release `isMinifyEnabled` / `isShrinkResources` follow `-PiranXrayMinify` (default false, so an ad-hoc build without the flag stays debuggable) |
+| `V2rayNG/app/proguard-rules.pro` | keeps `com.v2ray.ang.service.**` (the native tunnel calls back through fixed JNI names built with `-DPKGNAME=com/v2ray/ang/service`), `libv2ray.**`, `com.v2ray.ang.dto.**` and its fields (Gson writes them by name), the enums, `com.tencent.mmkv.**`, and the attributes R8 strips by default |
+| `.github/workflows/build-agent.yml` | `minify` boolean input (default true) and `MINIFY` env; both assemble commands pass `-PiranXrayMinify` |
+
+Result: 25,272,017 B (24.1 MiB), one `classes.dex` of 5.7 MB, zero missing-class warnings, the
+signature unchanged (`CN=Cloak`). `Not run`: the runtime checks R8 makes necessary (launch, profile
+persistence across restart, settings save, connecting a profile) were not executed on a device in
+this round.
+
+## Round 3: Iran preset (this build)
+
+The three client-side settings that decide whether a handshake survives Iranian DPI lived in three
+different parts of the form. One button now sets all three.
+
+| File | Change |
+|---|---|
+| `ui/server/IranPreset.kt` | new: `FINGERPRINT = "chrome"`, `DIAL_MODE = "oob.0"`, `FINAL_MASK` = the `merge` preset (`times: 100`, `delayMs: 30`, `maxBytes: 16384`), kept byte-identical to `final_mask_preset_values` in `res/values/arrays.xml` |
+| `ui/server/BaseServerActivity.kt` | `IranPresetButton` under the dialMode field: sets the three values and confirms with a toast |
+| `res/values*/strings.xml` (10 locales) | `server_preset_iran`, `server_preset_iran_applied`, `server_preset_iran_hint` |
+| `test/.../ui/server/IranPresetTest.kt` | new: the mask parses as JSON and carries the merge settings; the two literal values stay what Xray reads |
+
+The preset does not touch the address, the port or the keys: those belong to the server. It also
+cannot turn mux off, because mux is a global setting (`PREF_MUX_ENABLED`), not a profile one.

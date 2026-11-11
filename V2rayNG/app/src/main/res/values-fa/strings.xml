@@ -790,4 +790,8 @@
     <string name="sub_info_open_page">باز کردن صفحه اطلاعات اشتراک</string>
     <string name="sub_info_unlimited">نامحدود</string>
 
+
+    <string name="server_preset_iran">پریست ایران</string>
+    <string name="server_preset_iran_applied">پریست ایران اعمال شد</string>
+    <string name="server_preset_iran_hint">اثرانگشت Chrome، ماسک merge و dialMode «oob.0»: تنظیماتی که از فیلترینگ ایران رد می‌شوند.</string>
 </resources>

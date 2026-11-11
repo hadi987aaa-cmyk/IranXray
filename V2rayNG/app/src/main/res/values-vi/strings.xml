@@ -788,4 +788,8 @@
     <string name="sub_info_open_page">Mở trang thông tin đăng ký</string>
     <string name="sub_info_unlimited">Không giới hạn</string>
 
+
+    <string name="server_preset_iran">Bộ cài sẵn Iran</string>
+    <string name="server_preset_iran_applied">Đã áp dụng bộ cài sẵn Iran</string>
+    <string name="server_preset_iran_hint">Vân tay Chrome, mặt nạ merge và dial OOB: các thiết lập vượt qua bộ lọc Iran.</string>
 </resources>

@@ -788,4 +788,8 @@
     <string name="sub_info_open_page">打开订阅信息页面</string>
     <string name="sub_info_unlimited">无限制</string>
 
+
+    <string name="server_preset_iran">伊朗预设</string>
+    <string name="server_preset_iran_applied">已应用伊朗预设</string>
+    <string name="server_preset_iran_hint">Chrome 指纹、merge 掩码与 OOB dial：可绕过伊朗过滤的设置。</string>
 </resources>

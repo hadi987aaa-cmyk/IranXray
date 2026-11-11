@@ -14,6 +14,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -267,6 +269,7 @@ abstract class BaseServerActivity : BaseComponentActivity() {
                 { state.finalMask = it }
             )
             CommonDialModeField(state)
+            IranPresetButton(state)
             if (state.network == NetworkType.WS.type || state.network == NetworkType.XHTTP.type) {
                 FormDropdownField(
                     stringResource(R.string.server_lab_browser_dialer),
@@ -286,6 +289,33 @@ abstract class BaseServerActivity : BaseComponentActivity() {
             state.dialMode,
             { state.dialMode = it }
         )
+    }
+
+    /**
+     * IranXray: puts the settings of [IranPreset] on the profile being edited.
+     *
+     * They are the three options that decide whether the handshake survives Iranian DPI, and they are scattered over
+     * this form, so offering them together saves the user from finding three fields in three places.
+     */
+    @Composable
+    protected fun IranPresetButton(state: ServerUiState) {
+        val context = LocalContext.current
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            OutlinedButton(
+                onClick = {
+                    state.fingerPrint = IranPreset.FINGERPRINT
+                    state.dialMode = IranPreset.DIAL_MODE
+                    state.finalMask = IranPreset.FINAL_MASK
+                    context.toastSuccess(R.string.server_preset_iran_applied)
+                }
+            ) {
+                Text(stringResource(R.string.server_preset_iran))
+            }
+            Text(
+                text = stringResource(R.string.server_preset_iran_hint),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 
     /** targetStrategy is an option of every Xray outbound, so every protocol offers it. */
