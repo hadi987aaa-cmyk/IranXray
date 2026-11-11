@@ -58,7 +58,10 @@ jobs:
       # `lite` keeps only the cores a direct VLESS+REALITY profile needs, which removes
       # roughly 54 MB of native payload. `all` restores Aether, Psiphon and Tor.
       CORES: ${{ inputs.cores || 'lite' }}
-      MINIFY: ${{ inputs.minify || 'false' }}
+      # Shrinking is on for every build, and a manual run can turn it off with minify=false.
+      # Spelled out this way because `inputs` is empty on push, where `inputs.minify || 'true'`
+      # would quietly evaluate to the fallback for a false input as well.
+      MINIFY: ${{ github.event_name == 'workflow_dispatch' && inputs.minify == false && 'false' || 'true' }}
       # An unset secret evaluates to an empty string, which the restore step keys on.
       DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
       RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
