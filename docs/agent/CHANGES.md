@@ -213,3 +213,22 @@ text can be pasted into a public issue.
 | ``test/.../core/DiagnosticsReportTest.kt`` | new: exact line layout, no trailing blank line, empty DNS prints ``-``, several servers stay on one line, and no share-link scheme or credential ever appears |
 
 ``Not run``: the clipboard copy and the toast were not exercised on a device in this round.
+## Round 11: the release APK stores classes.dex compressed
+
+Measurement first: in the 0.10.0 APK, `classes.dex` (5,702,540 B), `resources.arsc` and the
+`res/**.png` entries are all stored with method 0, i.e. not deflated, which is the modern AGP
+default. Only `lib/**` and `assets/**` were compressed.
+
+`resources.arsc` must stay uncompressed (Android 11+ requirement), but `classes.dex` does not.
+`packaging { dex { useLegacyPackaging = true } }` turns the old behaviour back on: Android
+extracts the dex at install time instead of mapping it straight from the APK.
+
+| File | Change |
+|---|---|
+| ``V2rayNG/app/build.gradle.kts`` | ``packaging { dex { useLegacyPackaging = true } }``; ``jniLibs`` keeps its existing setting |
+
+Trade-off accepted: a small cold-start cost in exchange for a smaller file to download by hand.
+If the DSL name were wrong the Gradle configuration step would fail immediately, before the
+long native steps, so the experiment costs a minute at most.
+
+``Not run``: cold-start time was not measured on a device in this round.

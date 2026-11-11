@@ -165,6 +165,11 @@ android {
         jniLibs {
             useLegacyPackaging = true
         }
+        // Modern AGP stores classes.dex uncompressed. This APK is handed to people by hand,
+        // so the ~3 MB of download size is worth more than the marginal cold-start gain.
+        dex {
+            useLegacyPackaging = true
+        }
     }
 
     testOptions {
