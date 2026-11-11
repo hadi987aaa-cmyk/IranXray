@@ -804,4 +804,13 @@
     <string name="server_preset_iran_hint">بصمة Chrome وقناع merge و dialMode «oob.0»: الإعدادات التي تتجاوز التصفية الإيرانية.</string>
 
     <string name="toast_aether_not_packaged">لا يتضمن هذا الإصدار نواة Aether. ثبّت الإصدار الكامل لاستخدام هذا الملف.</string>
+    <string name="aether_hint_fragment_delay">2-10</string>
+    <string name="aether_hint_fragment_size">8-16</string>
+    <string name="aether_lab_exit_dial_mode">exit-node dialMode</string>
+    <string name="aether_lab_exit_node">exit-node</string>
+    <string name="preset_setting_cipher_suites">cipherSuites</string>
+    <string name="preset_setting_dial_mode">dialMode</string>
+    <string name="preset_setting_final_mask">finalMask</string>
+    <string name="server_lab_target_strategy">targetStrategy</string>
+    <string name="sub_info_traffic">%1$s / %2$s</string>
 </resources>

@@ -269,6 +269,47 @@ jobs:
             echo "APK_DIR=V2rayNG/app/build/outputs/apk/playstore/debug" >> "$GITHUB_ENV"
           fi
 
+      # The gradle property the app reads its core set from has to arrive in the generated
+      # BuildConfig, not only on the command line: a typo would otherwise leave every build
+      # looking like a full one, and "lite" would silently ship every core again.
+      - name: Verify the build settings reached the code
+        shell: bash
+        run: |
+          set -euo pipefail
+          file="$(find V2rayNG/app/build/generated/source/buildConfig -name BuildConfig.java -print -quit)"
+          if [ -z "$file" ]; then echo "::error::no generated BuildConfig.java was found"; exit 1; fi
+          echo "generated: $file"
+          grep -n "CORES" "$file" || true
+          if ! grep -qF "public static final String CORES = \"$CORES\";" "$file"; then
+            echo "::error file=$file::BuildConfig.CORES does not carry $CORES"
+            exit 1
+          fi
+          echo "ok      BuildConfig.CORES = $CORES"
+
+      # A string added to values/ but not to a locale falls back to English on that phone,
+      # which is how nine labels were missing in every translation. Fail instead.
+      - name: Verify every locale carries the default strings
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob, os, sys
+          import xml.etree.ElementTree as ET
+
+          res = "V2rayNG/app/src/main/res"
+
+          def names(path):
+              return {e.get("name") for e in ET.parse(path).getroot().findall("string")}
+
+          base = names(os.path.join(res, "values", "strings.xml"))
+          bad = False
+          for path in sorted(glob.glob(os.path.join(res, "values-*", "strings.xml"))):
+              missing = sorted(base - names(path))
+              if missing:
+                  bad = True
+                  print("::error file=%s::missing %d string(s): %s" % (path, len(missing), ", ".join(missing[:12])))
+          sys.exit(1 if bad else 0)
+          PY
+
       - name: Upload the APK
         uses: actions/upload-artifact@v7
         with:

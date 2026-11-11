@@ -36,7 +36,6 @@ enum class MainDestination(@DrawableRes val iconRes: Int, @StringRes val labelRe
     Routing(R.drawable.ic_routing_24dp, R.string.routing_settings_title),
     UserAssets(R.drawable.ic_file_24dp, R.string.title_user_asset_setting),
     Settings(R.drawable.ic_settings_24dp, R.string.title_settings),
-    Promotion(R.drawable.ic_promotion_24dp, R.string.title_pref_promotion),
     Logcat(R.drawable.ic_logcat_24dp, R.string.title_logcat),
     CheckUpdate(R.drawable.ic_check_update_24dp, R.string.update_check_for_update),
     BackupRestore(R.drawable.ic_restore_24dp, R.string.title_configuration_backup_restore),
@@ -52,7 +51,6 @@ private val primaryDrawerItems = listOf(
 )
 
 private val drawerItems = primaryDrawerItems + listOf(
-    MainDestination.Promotion,
     MainDestination.Logcat,
     MainDestination.CheckUpdate,
     MainDestination.BackupRestore,
@@ -85,10 +83,11 @@ fun MainDrawerContent(drawerState: DrawerState, onNavigate: (MainDestination) ->
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    // PattNG: full-color circular logo, no dark-mode tint (tinting a photo logo
-                    // would flatten it into a white disc)
+                    // IranXray: the mark the phone shows as the app icon, so the drawer cannot
+                    // carry another build's logo. Full color, not tinted: tinting the artwork would
+                    // flatten it into a solid disc.
                     Image(
-                        painter = painterResource(R.drawable.ic_pattng_logo),
+                        painter = painterResource(R.mipmap.ic_launcher_foreground),
                         contentDescription = null,
                         modifier = Modifier.size(120.dp)
                     )

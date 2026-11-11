@@ -102,3 +102,27 @@ saying why.
 | `test/.../ui/main/ImportMenuActionsTest.kt` | new: only Aether leaves the menu; a full build still offers it |
 
 `Not run`: the toast and the menu were not observed on a device in this round.
+
+## Round 5: the app stops carrying another build's promotion and logo
+
+Three things in the drawer were inherited from upstream and visible on every launch: a
+`Promotion` entry that opened a third-party web page (`https://9.234456.xyz/abc.html`, base64 in
+`AppConfig.APP_PROMOTION_URL`), and a 270 KB `ic_pattng_logo.png` shown as the drawer header, while
+the launcher icon was already this build's own. The nine newest strings also fell back to English
+in every one of the nine translations.
+
+| File | Change |
+|---|---|
+| `ui/main/MainDrawer.kt` | `MainDestination.Promotion` removed from the enum and from the drawer list; header image is `R.mipmap.ic_launcher_foreground` instead of `R.drawable.ic_pattng_logo` |
+| `ui/main/MainActivity.kt` | the `Promotion` branch of `navigateTo` removed, so no code path opens that page |
+| `res/drawable-nodpi/ic_pattng_logo.png` | deleted (270,217 B) |
+| `res/values*/strings.xml` (9 locales) | the nine strings that were only in `values/`: `aether_hint_fragment_delay`, `aether_hint_fragment_size`, `aether_lab_exit_dial_mode`, `aether_lab_exit_node`, `preset_setting_cipher_suites`, `preset_setting_dial_mode`, `preset_setting_final_mask`, `server_lab_target_strategy`, `sub_info_traffic` |
+| `.github/workflows/build-agent.yml` | two new checks after the assemble step: `BuildConfig.CORES` must carry the requested core set, and every `values-*` locale must carry every key of `values/` |
+| `docs/agent/CHANGES.md` | this section |
+
+The two checks exist because both failures are silent: a misnamed gradle property falls back to
+`all` (a lite build would ship every core again without a word), and a missing translation falls
+back to English on that phone. `AppConfig.APP_PROMOTION_URL` itself is left in place; nothing reads
+it any more.
+
+`Not run`: the drawer was not looked at on a device in this round.

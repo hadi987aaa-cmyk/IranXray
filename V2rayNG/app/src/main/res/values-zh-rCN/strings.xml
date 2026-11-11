@@ -794,4 +794,13 @@
     <string name="server_preset_iran_hint">Chrome 指纹、merge 掩码与 OOB dial：可绕过伊朗过滤的设置。</string>
 
     <string name="toast_aether_not_packaged">此版本不包含 Aether 内核。请安装完整版本以使用此配置文件。</string>
+    <string name="aether_hint_fragment_delay">2-10</string>
+    <string name="aether_hint_fragment_size">8-16</string>
+    <string name="aether_lab_exit_dial_mode">exit-node dialMode</string>
+    <string name="aether_lab_exit_node">exit-node</string>
+    <string name="preset_setting_cipher_suites">cipherSuites</string>
+    <string name="preset_setting_dial_mode">dialMode</string>
+    <string name="preset_setting_final_mask">finalMask</string>
+    <string name="server_lab_target_strategy">targetStrategy</string>
+    <string name="sub_info_traffic">%1$s / %2$s</string>
 </resources>
