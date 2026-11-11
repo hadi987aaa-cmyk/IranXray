@@ -301,7 +301,13 @@ jobs:
           res = "V2rayNG/app/src/main/res"
 
           def names(path):
-              return {e.get("name") for e in ET.parse(path).getroot().findall("string")}
+              # app_name is translatable="false": one value in values/ serves every locale, and a
+              # copy of it in a locale would be the duplicate the duplicate check rejects.
+              return {
+                  e.get("name")
+                  for e in ET.parse(path).getroot().findall("string")
+                  if (e.get("translatable") or "true") != "false"
+              }
 
           base = names(os.path.join(res, "values", "strings.xml"))
           bad = False
@@ -310,6 +316,27 @@ jobs:
               if missing:
                   bad = True
                   print("::error file=%s::missing %d string(s): %s" % (path, len(missing), ", ".join(missing[:12])))
+          sys.exit(1 if bad else 0)
+          PY
+
+      # The launcher name, the notification channel and the widget label are what the phone shows
+      # on a given language; a leftover upstream brand in one locale is visible to that user only,
+      # which is exactly the kind of miss no build error reports.
+      - name: Verify no upstream brand survives in the resources
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import glob, os, sys
+          import xml.etree.ElementTree as ET
+
+          res = "V2rayNG/app/src/main/res"
+          brand = "PattNG"
+          bad = False
+          for path in sorted(glob.glob(os.path.join(res, "values*", "strings.xml"))):
+              for element in ET.parse(path).getroot():
+                  if brand in "".join(element.itertext()):
+                      bad = True
+                      print("::error file=%s::%s still names %s" % (path, element.get("name"), brand))
           sys.exit(1 if bad else 0)
           PY
 

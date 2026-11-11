@@ -142,3 +142,18 @@ have looked like an update for ever.
 | `test/.../handler/UpdateCheckerManagerTest.kt` | new: the asset name wins over the tag, unorderable tags are refused, `0.10.0 > 0.9.0`, and the newest build of the installed version is not an update |
 
 `Not run`: the dialog was not opened on a device in this round.
+
+## Round 7: the app stops calling itself PattNG on every language but English
+
+`app_name` is `translatable="false"`, yet all nine locale files carried their own copy — set to
+`PattNG`. A Persian phone therefore showed the upstream name under the launcher icon, in the
+notification channel ("سرویس PattNG"), on the quick-settings tile and in several Vietnamese toasts,
+while only the English/default resource said `IranXray`.
+
+| File | Change |
+|---|---|
+| `res/values-*/strings.xml` (9 locales) | the `app_name` copy removed, since one non-translatable value in `values/` serves every locale |
+| `res/values*/strings.xml` (10 files) | the remaining `PattNG` mentions replaced by `IranXray` (notification channel, widget and tile labels, the Vietnamese strings, `title_server`) |
+| `.github/workflows/build-agent.yml` | the locale-parity check now ignores `translatable="false"` keys, and a new check fails the build when `PattNG` survives anywhere under `res/values*/` |
+
+`Not run`: the launcher label and the notification channel were not looked at on a device.
