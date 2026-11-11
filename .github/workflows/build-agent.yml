@@ -253,6 +253,7 @@ jobs:
             ./gradlew --no-daemon :app:assemblePlaystoreRelease \
               -PiranXrayVersion="$VERSION_NAME" \
               -PiranXrayMinify="$MINIFY" \
+              -PiranXrayCores="$CORES" \
               -PABI_FILTERS="$ABI_FILTERS" \
               -Pandroid.injected.signing.store.file="$RUNNER_TEMP/release.jks" \
               -Pandroid.injected.signing.store.password="Cloak1405Iran" \
@@ -263,6 +264,7 @@ jobs:
             ./gradlew --no-daemon :app:assemblePlaystoreDebug \
               -PiranXrayVersion="$VERSION_NAME" \
               -PiranXrayMinify="$MINIFY" \
+              -PiranXrayCores="$CORES" \
               -PABI_FILTERS="$ABI_FILTERS"
             echo "APK_DIR=V2rayNG/app/build/outputs/apk/playstore/debug" >> "$GITHUB_ENV"
           fi

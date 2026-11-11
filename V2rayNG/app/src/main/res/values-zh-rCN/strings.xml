@@ -792,4 +792,6 @@
     <string name="server_preset_iran">伊朗预设</string>
     <string name="server_preset_iran_applied">已应用伊朗预设</string>
     <string name="server_preset_iran_hint">Chrome 指纹、merge 掩码与 OOB dial：可绕过伊朗过滤的设置。</string>
+
+    <string name="toast_aether_not_packaged">此版本不包含 Aether 内核。请安装完整版本以使用此配置文件。</string>
 </resources>

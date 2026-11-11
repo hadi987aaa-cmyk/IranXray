@@ -798,4 +798,6 @@
     <string name="server_preset_iran">Пресет для Ирана</string>
     <string name="server_preset_iran_applied">Пресет для Ирана применён</string>
     <string name="server_preset_iran_hint">Отпечаток Chrome, маска merge и dialMode oob.0 — настройки, проходящие иранскую фильтрацию.</string>
+
+    <string name="toast_aether_not_packaged">В этой сборке нет ядра Aether. Установите полную сборку, чтобы использовать этот профиль.</string>
 </resources>

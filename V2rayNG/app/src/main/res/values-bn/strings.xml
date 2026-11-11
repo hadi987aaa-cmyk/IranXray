@@ -794,4 +794,6 @@
     <string name="server_preset_iran">ইরান প্রিসেট</string>
     <string name="server_preset_iran_applied">ইরান প্রিসেট প্রয়োগ হয়েছে</string>
     <string name="server_preset_iran_hint">Chrome ফিঙ্গারপ্রিন্ট, merge মাস্ক ও OOB dial: ইরানের ফিল্টারিং এড়ানোর সেটিংস।</string>
+
+    <string name="toast_aether_not_packaged">এই বিল্ডে Aether কোর নেই। এই প্রোফাইল ব্যবহার করতে সম্পূর্ণ বিল্ড ইনস্টল করুন।</string>
 </resources>

@@ -802,4 +802,6 @@
     <string name="server_preset_iran">إعداد إيران المسبق</string>
     <string name="server_preset_iran_applied">تم تطبيق إعداد إيران</string>
     <string name="server_preset_iran_hint">بصمة Chrome وقناع merge و dialMode «oob.0»: الإعدادات التي تتجاوز التصفية الإيرانية.</string>
+
+    <string name="toast_aether_not_packaged">لا يتضمن هذا الإصدار نواة Aether. ثبّت الإصدار الكامل لاستخدام هذا الملف.</string>
 </resources>

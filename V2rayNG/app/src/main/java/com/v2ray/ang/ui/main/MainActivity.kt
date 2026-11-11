@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.core.CoreAvailability
 import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
@@ -212,6 +213,11 @@ class MainActivity : HelperBaseComponentActivity() {
     }
 
     private fun importManually(createConfigType: Int) {
+        // IranXray: a lite build has no Aether core, so its editor could neither fetch keys nor run the profile.
+        if (createConfigType == EConfigType.AETHER.value && !CoreAvailability.hasOptionalCores) {
+            toast(R.string.toast_aether_not_packaged, long = true)
+            return
+        }
         val intent = when (createConfigType) {
             EConfigType.POLICYGROUP.value -> Intent(this, ServerGroupActivity::class.java)
             EConfigType.PROXYCHAIN.value -> Intent(this, ServerProxyChainActivity::class.java)

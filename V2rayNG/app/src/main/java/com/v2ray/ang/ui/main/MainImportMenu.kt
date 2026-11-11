@@ -4,13 +4,14 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.v2ray.ang.R
+import com.v2ray.ang.core.CoreAvailability
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.ui.compose.AppDropdownMenuItems
 import com.v2ray.ang.ui.compose.SelectListDialog
 
-private enum class ImportMenuAction(@StringRes val labelRes: Int, val action: MainAction) {
+internal enum class ImportMenuAction(@StringRes val labelRes: Int, val action: MainAction) {
     QRCode(R.string.menu_item_import_config_qrcode, MainAction.ImportQRcode),
     Clipboard(R.string.menu_item_import_config_clipboard, MainAction.ImportClipboard),
     LocalFile(R.string.menu_item_import_config_local, MainAction.ImportConfigLocal),
@@ -59,9 +60,21 @@ internal fun serverMenuActions(
     (includeManagementActions || action.isShareAction) && (!isComplexProfile || action.supportsComplexProfiles)
 }
 
+/**
+ * The entries of the "import manually" menu.
+ *
+ * IranXray: a build without the optional cores cannot run an Aether profile, so it does not offer to create one; the
+ * profile would open an editor whose keys page and connection both need `libaether.so`.
+ */
+internal fun importMenuActions(
+    hasOptionalCores: Boolean = CoreAvailability.hasOptionalCores,
+): List<ImportMenuAction> = ImportMenuAction.entries.filter { action ->
+    hasOptionalCores || action != ImportMenuAction.Aether
+}
+
 @Composable
 fun ImportMenuContent(onAction: (MainAction) -> Unit) = AppDropdownMenuItems(
-    items = ImportMenuAction.entries,
+    items = importMenuActions(),
     labelRes = { it.labelRes },
     onSelected = { onAction(it.action) }
 )

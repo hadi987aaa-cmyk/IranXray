@@ -792,4 +792,6 @@
     <string name="server_preset_iran">Bộ cài sẵn Iran</string>
     <string name="server_preset_iran_applied">Đã áp dụng bộ cài sẵn Iran</string>
     <string name="server_preset_iran_hint">Vân tay Chrome, mặt nạ merge và dial OOB: các thiết lập vượt qua bộ lọc Iran.</string>
+
+    <string name="toast_aether_not_packaged">Bản dựng này không có lõi Aether. Hãy cài bản đầy đủ để dùng hồ sơ này.</string>
 </resources>

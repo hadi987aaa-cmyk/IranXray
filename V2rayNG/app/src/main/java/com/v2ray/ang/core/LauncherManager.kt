@@ -28,6 +28,7 @@ object LauncherManager {
             context.toast(R.string.app_tile_first_use)
             return false
         }
+        if (refusesMissingCore(context)) return false
         try {
             startContextService(context)
         } catch (e: Exception) {
@@ -45,12 +46,30 @@ object LauncherManager {
             MmkvManager.setSelectServer(guid)
         }
 
+        if (refusesMissingCore(context)) return
+
         try {
             startContextService(context)
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "LauncherManager: ${e.message}", e)
             context.toast(e.message ?: e.javaClass.simpleName)
         }
+    }
+
+    /**
+     * IranXray: whether the selected profile needs a core this build does not package, in which case it says so and
+     * the caller must not start the service.
+     *
+     * A lite build lists the Aether profiles a full build saved — the storage is the same — but it has no
+     * `libaether.so`, so starting one would fail where the user cannot see why.
+     */
+    private fun refusesMissingCore(context: Context): Boolean {
+        if (CoreAvailability.hasOptionalCores) return false
+        val guid = MmkvManager.getSelectServer().orEmpty()
+        val profile = guid.takeIf { it.isNotEmpty() }?.let { MmkvManager.decodeServerConfig(it) } ?: return false
+        if (profile.configType != EConfigType.AETHER) return false
+        context.toast(R.string.toast_aether_not_packaged, long = true)
+        return true
     }
 
     fun stopService(context: Context) {

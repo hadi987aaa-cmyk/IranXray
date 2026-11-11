@@ -16,6 +16,14 @@ android {
         versionCode = 755
         versionName = ((project.findProperty("iranXrayVersion") ?: project.findProperty("pattngVersion")) as? String)?.takeIf { it.isNotBlank() } ?: "2.3.15"
 
+        // IranXray: "lite" leaves the Aether, Psiphon and Tor cores out of the APK, so the UI can hide the profiles
+        // and the menus that would need them; see docs/agent/CHANGES.md.
+        buildConfigField(
+            "String",
+            "CORES",
+            "\"" + ((project.findProperty("iranXrayCores") as? String)?.takeIf { it.isNotBlank() } ?: "all") + "\""
+        )
+
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {
             abi {

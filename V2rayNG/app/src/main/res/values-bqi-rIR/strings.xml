@@ -794,4 +794,6 @@
     <string name="server_preset_iran">پریست ایران</string>
     <string name="server_preset_iran_applied">پریست ایران اعمال شد</string>
     <string name="server_preset_iran_hint">اثرانگشت Chrome، ماسک merge و dialMode «oob.0»: تنظیماتی که از فیلترینگ ایران رد می‌شوند.</string>
+
+    <string name="toast_aether_not_packaged">این نسخه هسته Aether را ندارد. برای استفاده از این پروفایل نسخه کامل (cores=all) را نصب کنید.</string>
 </resources>

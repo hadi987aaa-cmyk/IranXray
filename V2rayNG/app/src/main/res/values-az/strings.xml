@@ -795,4 +795,6 @@
     <string name="server_preset_iran">İran profili</string>
     <string name="server_preset_iran_applied">İran profili tətbiq edildi</string>
     <string name="server_preset_iran_hint">Chrome barmaq izi, merge maskası və OOB dial: İran filtrləməsini keçən ayarlar.</string>
+
+    <string name="toast_aether_not_packaged">Bu versiyada Aether nüvəsi yoxdur. Bu profili istifadə etmək üçün tam versiyanı quraşdırın.</string>
 </resources>

@@ -83,3 +83,22 @@ different parts of the form. One button now sets all three.
 
 The preset does not touch the address, the port or the keys: those belong to the server. It also
 cannot turn mux off, because mux is a global setting (`PREF_MUX_ENABLED`), not a profile one.
+
+## Round 4: lite builds hide the cores they lack
+
+A lite build leaves `libaether.so`, `libpsiphon-tunnel-core.so` and `liblyrebird.so` out, but the UI still offered
+Aether in the import menu and still listed Aether profiles saved by a full build. Selecting either failed without
+saying why.
+
+| File | Change |
+|---|---|
+| `V2rayNG/app/build.gradle.kts` | `buildConfigField("String", "CORES", ...)` from `-PiranXrayCores` (default `all`, so an ad-hoc build keeps every core) |
+| `.github/workflows/build-agent.yml` | both assemble commands pass `-PiranXrayCores="$CORES"` |
+| `core/CoreAvailability.kt` | new: `hasOptionalCores`, true unless `BuildConfig.CORES == "lite"` |
+| `ui/main/MainImportMenu.kt` | `importMenuActions()` drops the Aether entry when the cores are absent; the composable calls it |
+| `ui/main/MainActivity.kt` | `importManually` refuses Aether with a toast when the cores are absent (deep links and intents reach it too) |
+| `core/LauncherManager.kt` | `refusesMissingCore` stops a start from the button and from the quick-settings tile when the selected profile is an Aether one, and explains why |
+| `res/values*/strings.xml` (10 locales) | `toast_aether_not_packaged` |
+| `test/.../ui/main/ImportMenuActionsTest.kt` | new: only Aether leaves the menu; a full build still offers it |
+
+`Not run`: the toast and the menu were not observed on a device in this round.
