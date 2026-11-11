@@ -232,3 +232,21 @@ If the DSL name were wrong the Gradle configuration step would fail immediately,
 long native steps, so the experiment costs a minute at most.
 
 ``Not run``: cold-start time was not measured on a device in this round.
+## Round 12: the remote-endpoint lookup no longer depends on one host
+
+After a connection succeeds the app asks a public JSON endpoint for the exit country and address
+and shows them in the notification. Only `https://api.ip.sb/geoip` was ever asked, so when that
+host is unreachable the label simply stayed empty.
+
+`SpeedtestManager.getRemoteIPInfo()` now walks a short ordered list: the address from the
+`ip_api_url` setting first, then `https://api.ip.sb/geoip`, `https://ipinfo.io/json` and
+`https://api.myip.com`, stopping at the first answer. A blank setting is skipped rather than
+treated as "no lookup". `IPAPIInfo` gained the `cc` field that myip.com uses for the country code.
+
+| File | Change |
+|---|---|
+| ``handler/SpeedtestManager.kt`` | fallback chain via ``candidateIpInfoUrls`` (trimmed, de-duplicated, configured first); per-request timeout 4 s; an answer with neither address nor country counts as a failure so the next host is tried |
+| ``dto/IPAPIInfo.kt`` | ``cc`` field, read before the free-form ``country`` name |
+| ``test/.../handler/SpeedtestManagerTest.kt`` | new: order, blank setting, de-duplication, trimming, the historical default first, and parsing of the myip/ipinfo JSON shapes |
+
+``Not run``: the notification text was not observed on a device in this round.

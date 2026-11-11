@@ -19,6 +19,17 @@ object SpeedtestManager {
     )
 
     /**
+     * Asked in order until one answers. The first entry is the historical default; in Iran that
+     * host is frequently unreachable while a plain JSON endpoint still responds, and the caller
+     * only needs a country code and an address for the notification.
+     */
+    private val DEFAULT_IP_INFO_URLS = listOf(
+        "https://api.ip.sb/geoip",
+        "https://ipinfo.io/json",
+        "https://api.myip.com"
+    )
+
+    /**
      * Measures the time taken to establish a TCP connection to a given URL and port.
      *
      * @param url The URL to connect to.
@@ -53,18 +64,45 @@ object SpeedtestManager {
         return -1
     }
 
-    fun getRemoteIPInfo(): RemoteEndpointInfo? {
-        val url = MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL)
-            .takeIf { !it.isNullOrBlank() } ?: AppConfig.IP_API_URL
+    /**
+     * The configured address first, then the built-in ones. A blank setting is simply skipped, so
+     * a user who clears the field still gets an answer from the next provider.
+     */
+    internal fun candidateIpInfoUrls(
+        configured: String?,
+        fallback: List<String> = DEFAULT_IP_INFO_URLS
+    ): List<String> = buildList {
+        configured?.trim()?.takeIf { it.isNotEmpty() }?.let { add(it) }
+        fallback.forEach { raw ->
+            val url = raw.trim()
+            if (url.isNotEmpty() && url !in this) add(url)
+        }
+    }
 
+    fun getRemoteIPInfo(): RemoteEndpointInfo? {
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
         val httpPort = SettingsManager.getHttpPort()
         if (httpPort == 0) return null
+
+        val urls = candidateIpInfoUrls(MmkvManager.decodeSettingsString(AppConfig.PREF_IP_API_URL))
+        for (url in urls) {
+            val info = queryIpInfo(url, httpPort, proxyUsername, proxyPassword)
+            if (info != null) return info
+        }
+        return null
+    }
+
+    private fun queryIpInfo(
+        url: String,
+        httpPort: Int,
+        proxyUsername: String?,
+        proxyPassword: String?
+    ): RemoteEndpointInfo? {
         val content = HttpUtil.getUrlContent(
             UrlContentRequest(
                 url = url,
-                timeout = 5000,
+                timeout = 4000,
                 httpPort = httpPort,
                 proxyUsername = proxyUsername,
                 proxyPassword = proxyPassword
@@ -81,10 +119,13 @@ object SpeedtestManager {
 
         val country = listOf(
             ipInfo.country_code,
-            ipInfo.country,
+            ipInfo.cc,
             ipInfo.countryCode,
+            ipInfo.country,
             ipInfo.location?.country_code
         ).firstOrNull { !it.isNullOrBlank() }
+
+        if (ip.isNullOrBlank() && country.isNullOrBlank()) return null
 
         return RemoteEndpointInfo(
             country = country,
