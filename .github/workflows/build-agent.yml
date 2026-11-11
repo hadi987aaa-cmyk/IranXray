@@ -300,19 +300,20 @@ jobs:
 
           res = "V2rayNG/app/src/main/res"
 
-          def names(path):
-              # app_name is translatable="false": one value in values/ serves every locale, and a
-              # copy of it in a locale would be the duplicate the duplicate check rejects.
+          def entries(path):
               return {
-                  e.get("name")
+                  e.get("name"): (e.get("translatable") or "true") != "false"
                   for e in ET.parse(path).getroot().findall("string")
-                  if (e.get("translatable") or "true") != "false"
               }
 
-          base = names(os.path.join(res, "values", "strings.xml"))
+          # Only a translatable key in values/ has to exist in a locale: app_name is
+          # translatable="false", so one value serves every language. A locale may still define a
+          # name the base marks untranslatable (values-bqi-rIR does), which counts as present.
+          base_entries = entries(os.path.join(res, "values", "strings.xml"))
+          base = {name for name, translatable in base_entries.items() if translatable}
           bad = False
           for path in sorted(glob.glob(os.path.join(res, "values-*", "strings.xml"))):
-              missing = sorted(base - names(path))
+              missing = sorted(base - set(entries(path)))
               if missing:
                   bad = True
                   print("::error file=%s::missing %d string(s): %s" % (path, len(missing), ", ".join(missing[:12])))
