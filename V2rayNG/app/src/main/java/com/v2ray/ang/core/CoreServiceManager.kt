@@ -42,6 +42,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import libv2ray.CoreCallbackHandler
 import libv2ray.CoreController
 import libv2ray.ProcessFinder
@@ -76,6 +77,24 @@ object CoreServiceManager {
 
     @Volatile
     private var isReloading = false
+
+    /**
+     * Watches the tunnel while the core runs: one probe through Xray every
+     * [TunnelWatchdog.PROBE_INTERVAL_MS], and a restart of the core once
+     * [TunnelWatchdog.FAILURES_BEFORE_RESTART] probes in a row failed.
+     *
+     * It answers a tunnel that still reports itself running while nothing passes through it, which a
+     * user could otherwise only clear by stopping and starting the profile by hand.
+     */
+    private val watchdogScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var watchdogJob: Job? = null
+
+    /** Probes that failed since the last answer; written by the watchdog loop alone. */
+    @Volatile
+    private var watchdogFailures = 0
+
+    /** When this watchdog restarted the core, oldest first, so the hourly cap can be counted. */
+    private val watchdogRestarts = ArrayList<Long>()
 
     /** Tun descriptor the core was started with, null in the proxy only and root run modes. */
     private var currentVpnInterface: ParcelFileDescriptor? = null
@@ -163,6 +182,7 @@ object CoreServiceManager {
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)
         startNetworkMonitor(service)
+        startWatchdog()
     }
 
     /**
@@ -424,6 +444,7 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         connectionTestScope.coroutineContext.cancelChildren()
+        stopWatchdog()
         val service = getService() ?: return false
 
         networkMonitor?.unregister()
@@ -698,6 +719,123 @@ object CoreServiceManager {
             if (cause is CancellationException) {
                 MessageHelper.sendMsg2UI(service, AppConfig.MSG_MEASURE_DELAY_CANCEL, "", requestId)
             }
+        }
+    }
+
+    /**
+     * Starts the loop that probes the tunnel and restarts the core when it stops passing traffic.
+     * A second start while the loop runs is a no-op, so a reload does not begin a second one.
+     */
+    private fun startWatchdog() {
+        if (watchdogJob?.isActive == true) return
+        watchdogFailures = 0
+        watchdogJob = watchdogScope.launch {
+            while (isActive) {
+                delay(TunnelWatchdog.PROBE_INTERVAL_MS)
+                // A stop cancels this loop, so a service that still reports itself up while its core
+                // is gone is a core that died, not one that was put away.
+                if (isReloading || !isServiceRunning()) {
+                    watchdogFailures = 0
+                    continue
+                }
+                if (isRunning() && probeTunnel()) {
+                    if (watchdogFailures > 0) {
+                        LogUtil.i(AppConfig.TAG, "StartCore-Manager: Tunnel answers again after $watchdogFailures failed probe(s)")
+                    }
+                    watchdogFailures = 0
+                    continue
+                }
+                watchdogFailures++
+                when (TunnelWatchdog.decide(watchdogFailures, restartsInWindow(), serviceRunning = true, reloading = false)) {
+                    TunnelWatchdog.Decision.WAIT -> Unit
+                    TunnelWatchdog.Decision.RESTART -> restartAfterStall()
+                    TunnelWatchdog.Decision.GIVE_UP -> {
+                        LogUtil.e(
+                            AppConfig.TAG,
+                            "StartCore-Manager: Tunnel stayed dead after ${TunnelWatchdog.MAX_RESTARTS_PER_WINDOW} restarts, " +
+                                "the watchdog rests for ${TunnelWatchdog.GIVE_UP_PAUSE_MS} ms"
+                        )
+                        watchdogFailures = 0
+                        delay(TunnelWatchdog.GIVE_UP_PAUSE_MS)
+                    }
+                }
+            }
+        }
+    }
+
+    /** Stops the loop and forgets its counters, so a new start begins clean. */
+    private fun stopWatchdog() {
+        watchdogJob?.cancel()
+        watchdogJob = null
+        watchdogFailures = 0
+        synchronized(watchdogRestarts) { watchdogRestarts.clear() }
+    }
+
+    /**
+     * One probe through the tunnel: the configured delay test URL first, then the fallback, with
+     * [TunnelWatchdog.PROBE_TIMEOUT_MS] to answer. An answer of -1, a timeout or a throw all count
+     * as failure; only a real delay counts as the tunnel carrying traffic.
+     */
+    private suspend fun probeTunnel(): Boolean {
+        val urls = listOf(SettingsManager.getDelayTestUrl(), SettingsManager.getDelayTestUrl(true))
+            .filter { it.isNotBlank() }
+            .distinct()
+
+        for (url in urls) {
+            val answer = withTimeoutOrNull(TunnelWatchdog.PROBE_TIMEOUT_MS) {
+                try {
+                    coreController.measureDelay(url)
+                } catch (e: Exception) {
+                    LogUtil.w(AppConfig.TAG, "StartCore-Manager: Tunnel probe failed: ${e.message}")
+                    -1L
+                }
+            }
+            if (answer != null && answer >= 0) return true
+        }
+        return false
+    }
+
+    /**
+     * Restarts the core in place after the tunnel stopped passing traffic: the service, the
+     * notification and the VPN interface stay up, so nothing of this is visible to the user.
+     */
+    private fun restartAfterStall() {
+        val service = getService() ?: run {
+            watchdogFailures = 0
+            return
+        }
+        val guid = MmkvManager.getSelectServer()
+        synchronized(watchdogRestarts) {
+            watchdogRestarts.add(System.currentTimeMillis())
+            while (watchdogRestarts.size > TunnelWatchdog.MAX_RESTARTS_PER_WINDOW) watchdogRestarts.removeAt(0)
+        }
+
+        // Captured here, so a stop that arrives while the configuration is built ends the restart
+        // instead of leaving a core behind a service that is already going away.
+        val job = watchdogJob
+
+        isReloading = true
+        try {
+            LogUtil.w(AppConfig.TAG, "StartCore-Manager: Tunnel stopped passing traffic, restarting the core, guid=$guid")
+            val tunFd = currentVpnInterface
+            coreController.stopLoop()
+            if (!launchCore(service, tunFd, isReload = true, goesOn = { job?.isActive == true })) {
+                LogUtil.e(AppConfig.TAG, "StartCore-Manager: Watchdog restart left no core running, guid=$guid")
+            }
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: Watchdog restart failed: ${e.message}, guid=$guid", e)
+        } finally {
+            watchdogFailures = 0
+            isReloading = false
+        }
+    }
+
+    /** Restarts this watchdog made inside [TunnelWatchdog.RESTART_WINDOW_MS], older ones forgotten. */
+    private fun restartsInWindow(): Int {
+        val cutoff = System.currentTimeMillis() - TunnelWatchdog.RESTART_WINDOW_MS
+        return synchronized(watchdogRestarts) {
+            watchdogRestarts.removeAll { it < cutoff }
+            watchdogRestarts.size
         }
     }
 

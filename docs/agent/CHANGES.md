@@ -345,3 +345,19 @@ while removing the shared constant.
 
 `Not run`: nothing was captured on a device or a server, so the effect on a real DPR is unproven;
 the ranges are a reasoned envelope, not a measured distribution.
+## Round 18: the tunnel watchdog
+
+Reported by the user on 1.0.0: the connection sometimes stops passing traffic while the app still
+reports the profile as running, and the only way back is to stop and start the profile by hand.
+
+| File | Change |
+| --- | --- |
+| `core/TunnelWatchdog.kt` | new: pure decision helper (`WAIT`, `RESTART`, `GIVE_UP`) over probe interval 45 s, probe timeout 20 s, 3 consecutive failures, at most 4 restarts per hour, then a 15 min rest |
+| `core/CoreServiceManager.kt` | `startWatchdog()` from `doStartCoreLoop`, `stopWatchdog()` from `stopCoreLoop`; every 45 s a probe through the live core (`coreController.measureDelay` on the delay test URL, then the fallback URL); a dead core, a -1 answer, a timeout or a throw all count as failure; after the third the core restarts in place through `launchCore(isReload = true)` |
+| `test/.../core/TunnelWatchdogTest.kt` | 8 tests: the threshold, a stopped service, a reload in flight, the restart cap, one restart below the cap, and the loop constants |
+
+Why: nothing in the app noticed a tunnel that was up but dead. `NetworkMonitor` reloads only on a
+network handover, and a dead core behind a live service had no owner at all.
+
+`Not run`: the service-lifecycle scenarios this touches (restart while running, stop racing a
+restart) need a device; they were not executed. JVM tests cover the decision only.
