@@ -617,7 +617,7 @@ object CoreOutboundBuilder {
                 sni = host
                 xhttpSetting.path = path ?: "/"
                 xhttpSetting.mode = xhttpMode
-                xhttpSetting.extra = JsonUtil.parseString(xhttpExtra)
+                xhttpSetting.extra = JsonUtil.parseString(XhttpJitter.apply(xhttpExtra))
                 streamSettings.xhttpSettings = xhttpSetting
             }
 

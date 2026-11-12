@@ -17,6 +17,24 @@ editing at the same time.
   Kotlin under `V2rayNG/app/src/main/java/com/v2ray/ang/`. Everything else is only touched with
   small, reviewable edits — listed below.
 
+## Round 15: the XHTTP rhythm is sampled per connection
+
+A live capture on the user's own server showed the tunnel emitting one 47-byte prelude followed by one
+~380-byte body every 20 ms for as long as the session lasted: the default `scMinPostsIntervalMs`. Any
+filter can key on that rhythm without ever reading the payload, and every user of this build shares it.
+
+`core/XhttpJitter.kt` fills `scMinPostsIntervalMs` (22-55 ms) and `xpaddingBytes` (a 150-900 byte
+window) per connection, and `core/CoreOutboundBuilder.kt` applies it where the XHTTP settings are built.
+A value the user typed is preserved; only absent keys are filled in.
+
+| File | Change |
+|---|---|
+| `V2rayNG/app/src/main/java/com/v2ray/ang/core/XhttpJitter.kt` | new: samples the two timing knobs |
+| `V2rayNG/app/src/main/java/com/v2ray/ang/core/CoreOutboundBuilder.kt` | the XHTTP block applies the sampled extra |
+| `V2rayNG/app/src/test/java/com/v2ray/ang/core/XhttpJitterTest.kt` | new: 7 tests over blank, hand-written and unreadable input |
+
+Not run: no device build here. The new rhythm has to be confirmed by capturing the tunnel again on the
+server, which is the next step with the user.
 ## Changes against `my-releases`
 
 | File | Change |
