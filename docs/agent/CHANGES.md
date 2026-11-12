@@ -35,6 +35,22 @@ A value the user typed is preserved; only absent keys are filled in.
 
 Not run: no device build here. The new rhythm has to be confirmed by capturing the tunnel again on the
 server, which is the next step with the user.
+## Round 16: 1.0.0, the build a user can keep
+
+The About screen's diagnostics line now records which sampling produced the report
+(`Shaping: mask 60-160 / 18-45 ms / 8-28 KB, xhttp 22-55 ms`), assembled from the jitter constants
+themselves so it cannot drift, and `docs/PRODUCT.md` is the short Persian guide a user needs
+(install, add a config, the two buttons, the sampling table, the escape hatch, the limits).
+
+| File | Change |
+|---|---|
+| `V2rayNG/app/src/main/java/com/v2ray/ang/core/DiagnosticsReport.kt` | optional `shaping` line + `shapingSummary()` |
+| `V2rayNG/app/src/main/java/com/v2ray/ang/core/IranMaskJitter.kt` | sampling ranges exposed as public constants |
+| `V2rayNG/app/src/main/java/com/v2ray/ang/ui/AboutActivity.kt` | passes the summary into the report |
+| `V2rayNG/app/src/test/java/com/v2ray/ang/core/DiagnosticsReportTest.kt` | asserts the shaping line and its position |
+| `docs/PRODUCT.md` | new: Persian user guide |
+
+Not run: no device build here; the app still has to be tried on the phone.
 ## Changes against `my-releases`
 
 | File | Change |

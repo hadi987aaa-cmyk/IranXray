@@ -19,12 +19,12 @@ object IranMaskJitter {
     const val PRESET_DELAY_MS = 30
     const val PRESET_MAX_BYTES = 16384
 
-    private const val MIN_TIMES = 60
-    private const val MAX_TIMES = 160
-    private const val MIN_DELAY_MS = 18
-    private const val MAX_DELAY_MS = 45
-    private const val MIN_MAX_BYTES_KB = 8
-    private const val MAX_MAX_BYTES_KB = 28
+    const val MIN_TIMES = 60
+    const val MAX_TIMES = 160
+    const val MIN_DELAY_MS = 18
+    const val MAX_DELAY_MS = 45
+    const val MIN_MAX_BYTES_KB = 8
+    const val MAX_MAX_BYTES_KB = 28
 
     /** True when [mask] is still the untouched preset, i.e. a mask [apply] would sample. */
     fun isPresetMask(mask: String?): Boolean = presetRoot(mask) != null

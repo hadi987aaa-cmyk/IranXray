@@ -62,4 +62,24 @@ class DiagnosticsReportTest {
             assertFalse(text.contains(it, ignoreCase = true), text)
         }
     }
+    @Test
+    fun `the shaping summary appears when the caller supplies one`() {
+        val text = DiagnosticsReport.build(
+            appVersion = "1.0.0",
+            libVersion = "26.11.1",
+            cores = "lite",
+            androidVersion = "13",
+            sdkInt = 33,
+            mode = "vpn",
+            socksPort = 10808,
+            remoteDns = emptyList(),
+            routingRulesets = 0,
+            delayTestUrl = "https://www.bing.com",
+            shaping = DiagnosticsReport.shapingSummary()
+        )
+        val line = text.lines().single { it.startsWith("Shaping:") }
+        assertTrue(line.contains("mask 60-160"), line)
+        assertTrue(line.contains("xhttp 22-55"), line)
+        assertEquals("Delay test: https://www.bing.com", text.lines().last())
+    }
 }

@@ -18,6 +18,7 @@ object DiagnosticsReport {
         remoteDns: List<String>,
         routingRulesets: Int,
         delayTestUrl: String,
+        shaping: String = "",
     ): String = buildString {
         appendLine("Shaghali $appVersion (Xray $libVersion, cores $cores)")
         appendLine("Android $androidVersion (SDK $sdkInt)")
@@ -25,6 +26,20 @@ object DiagnosticsReport {
         appendLine("SOCKS port: $socksPort")
         appendLine("DNS: ${if (remoteDns.isEmpty()) "-" else remoteDns.joinToString(", ")}")
         appendLine("Routing rulesets: $routingRulesets")
+        if (shaping.isNotBlank()) {
+            appendLine("Shaping: $shaping")
+        }
         append("Delay test: $delayTestUrl")
+    }
+
+    /**
+     * Describes the sampling this build applies at connect time, so a pasted report says which
+     * transport shape produced it. Built from the constants that do the sampling, never a copy of them.
+     */
+    fun shapingSummary(): String = buildString {
+        append("mask ${IranMaskJitter.MIN_TIMES}-${IranMaskJitter.MAX_TIMES} / ")
+        append("${IranMaskJitter.MIN_DELAY_MS}-${IranMaskJitter.MAX_DELAY_MS} ms / ")
+        append("${IranMaskJitter.MIN_MAX_BYTES_KB}-${IranMaskJitter.MAX_MAX_BYTES_KB} KB")
+        append(", xhttp ${XhttpJitter.MIN_INTERVAL_MS}-${XhttpJitter.MAX_INTERVAL_MS} ms")
     }
 }

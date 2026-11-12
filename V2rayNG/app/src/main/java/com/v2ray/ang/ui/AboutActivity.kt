@@ -69,7 +69,8 @@ class AboutActivity : BaseComponentActivity() {
             socksPort = SettingsManager.getSocksPort(),
             remoteDns = SettingsManager.getRemoteDnsServers(),
             routingRulesets = MmkvManager.decodeRoutingRulesets()?.size ?: 0,
-            delayTestUrl = SettingsManager.getDelayTestUrl()
+            delayTestUrl = SettingsManager.getDelayTestUrl(),
+            shaping = DiagnosticsReport.shapingSummary()
         )
     }
 
