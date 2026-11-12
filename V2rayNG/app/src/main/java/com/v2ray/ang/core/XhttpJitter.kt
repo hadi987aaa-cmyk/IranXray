@@ -5,18 +5,20 @@ import com.v2ray.ang.util.JsonUtil
 import kotlin.random.Random
 
 /**
- * An XHTTP connection is visible on the wire as a rhythm: with the packaged defaults every POST follows
- * the previous one by the same short interval, so one whole session looks like a metronome — a live
- * capture of a real server showed one exchange every 20 ms for as long as the tunnel stayed open.
+ * An XHTTP connection is visible on the wire as a rhythm and a payload size: with the packaged defaults
+ * every POST follows the previous one by the same short interval and carries up to the same maximum
+ * number of bytes, so one whole session looks like a metronome — a live capture of a real server showed
+ * one exchange every 20 ms for as long as the tunnel stayed open.
  *
- * Sampling that interval per connection keeps the transport doing exactly what it did before, while
- * removing the constant that a single filter rule could otherwise key on. A value the user typed
- * themselves is left alone: this only fills in what is absent.
+ * Sampling those constants per connection keeps the transport doing exactly what it did before, while
+ * removing the values a single filter rule could otherwise key on. A value the user typed themselves is
+ * left alone: this only fills in what is absent.
  */
 object XhttpJitter {
 
     const val KEY_INTERVAL = "scMinPostsIntervalMs"
     const val KEY_PADDING = "xpaddingBytes"
+    const val KEY_MAX_POST = "scMaxEachPostBytes"
 
     /** Range the sampled post interval is drawn from, in milliseconds. */
     const val MIN_INTERVAL_MS = 22
@@ -26,8 +28,12 @@ object XhttpJitter {
     const val MIN_PADDING_BYTES = 150
     const val MAX_PADDING_BYTES = 900
 
+    /** Range the sampled upload chunk ceiling is drawn from, in bytes. */
+    const val MIN_MAX_POST_BYTES = 400_000
+    const val MAX_MAX_POST_BYTES = 900_000
+
     /**
-     * Returns [extra] with the two timing knobs filled in, or [extra] itself when it is not a JSON object.
+     * Returns [extra] with the timing knobs filled in, or [extra] itself when it is not a JSON object.
      * [random] is injectable so tests can pin the sampled values.
      */
     fun apply(extra: String?, random: Random = Random.Default): String {
@@ -44,6 +50,11 @@ object XhttpJitter {
             val start = random.nextInt(MIN_PADDING_BYTES, MAX_PADDING_BYTES / 2)
             val end = random.nextInt(start + 100, MAX_PADDING_BYTES + 1)
             root.addProperty(KEY_PADDING, "$start-$end")
+        }
+        if (!root.has(KEY_MAX_POST)) {
+            val start = random.nextInt(MIN_MAX_POST_BYTES, (MIN_MAX_POST_BYTES + MAX_MAX_POST_BYTES) / 2)
+            val end = random.nextInt(start + 100_000, MAX_MAX_POST_BYTES + 1)
+            root.addProperty(KEY_MAX_POST, "$start-$end")
         }
         return root.toString()
     }

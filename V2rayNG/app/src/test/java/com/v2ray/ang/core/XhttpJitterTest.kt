@@ -25,6 +25,20 @@ class XhttpJitterTest {
     }
 
     @Test
+    fun `a profile without extra gets an upload chunk ceiling`() {
+        val result = parsed(XhttpJitter.apply(null, Random(9)))
+
+        val ceiling = result.get(XhttpJitter.KEY_MAX_POST).asString
+        val parts = ceiling.split("-")
+        assertEquals(2, parts.size, "ceiling=$ceiling")
+        val start = parts[0].toInt()
+        val end = parts[1].toInt()
+        assertTrue(start >= XhttpJitter.MIN_MAX_POST_BYTES, "start=$start")
+        assertTrue(end <= XhttpJitter.MAX_MAX_POST_BYTES, "end=$end")
+        assertTrue(start < end, "ceiling=$ceiling")
+    }
+
+    @Test
     fun `a blank string behaves like no extra`() {
         val result = parsed(XhttpJitter.apply("   ", Random(3)))
         assertNotNull(result.get(XhttpJitter.KEY_INTERVAL))

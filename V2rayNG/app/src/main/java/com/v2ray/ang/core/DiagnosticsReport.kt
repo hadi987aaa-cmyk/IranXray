@@ -41,5 +41,6 @@ object DiagnosticsReport {
         append("${IranMaskJitter.MIN_DELAY_MS}-${IranMaskJitter.MAX_DELAY_MS} ms / ")
         append("${IranMaskJitter.MIN_MAX_BYTES_KB}-${IranMaskJitter.MAX_MAX_BYTES_KB} KB")
         append(", xhttp ${XhttpJitter.MIN_INTERVAL_MS}-${XhttpJitter.MAX_INTERVAL_MS} ms")
+        append(", post ${XhttpJitter.MIN_MAX_POST_BYTES / 1000}-${XhttpJitter.MAX_MAX_POST_BYTES / 1000} KB")
     }
 }

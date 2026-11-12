@@ -51,6 +51,22 @@ themselves so it cannot drift, and `docs/PRODUCT.md` is the short Persian guide 
 | `docs/PRODUCT.md` | new: Persian user guide |
 
 Not run: no device build here; the app still has to be tried on the phone.
+## Round 17: the upload chunk ceiling is sampled too
+
+The interval and the padding were sampled in round 15, but every session still advertised the same
+maximum POST payload, so the *size* half of the rhythm stayed constant. `scMaxEachPostBytes` is now
+drawn per connection from 400-900 KB, and the diagnostics line records it next to the other ranges.
+
+| File | Change |
+|---|---|
+| `V2rayNG/app/src/main/java/com/v2ray/ang/core/XhttpJitter.kt` | samples `scMaxEachPostBytes` when the profile leaves it out |
+| `V2rayNG/app/src/main/java/com/v2ray/ang/core/DiagnosticsReport.kt` | `post <min>-<max> KB` appended to the shaping line |
+| `V2rayNG/app/src/test/java/com/v2ray/ang/core/XhttpJitterTest.kt` | asserts the sampled ceiling and its ordering |
+| `V2rayNG/app/src/test/java/com/v2ray/ang/core/DiagnosticsReportTest.kt` | asserts the new segment of the shaping line |
+
+A value the user wrote themselves is still left alone: only absent keys are filled.
+
+Not run: no device build here; the transport still has to be compared against a capture from the phone.
 ## Changes against `my-releases`
 
 | File | Change |

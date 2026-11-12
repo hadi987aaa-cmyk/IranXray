@@ -80,6 +80,7 @@ class DiagnosticsReportTest {
         val line = text.lines().single { it.startsWith("Shaping:") }
         assertTrue(line.contains("mask 60-160"), line)
         assertTrue(line.contains("xhttp 22-55"), line)
+        assertTrue(line.contains("post 400-900 KB"), line)
         assertEquals("Delay test: https://www.bing.com", text.lines().last())
     }
 }
