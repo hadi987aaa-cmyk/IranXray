@@ -46,9 +46,9 @@ object TunnelWatchdog {
         serviceRunning: Boolean,
         reloading: Boolean,
     ): Decision = when {
-        !serviceRunning || reloading -> WAIT
-        consecutiveFailures < FAILURES_BEFORE_RESTART -> WAIT
-        restartsInWindow >= MAX_RESTARTS_PER_WINDOW -> GIVE_UP
-        else -> RESTART
+        !serviceRunning || reloading -> Decision.WAIT
+        consecutiveFailures < FAILURES_BEFORE_RESTART -> Decision.WAIT
+        restartsInWindow >= MAX_RESTARTS_PER_WINDOW -> Decision.GIVE_UP
+        else -> Decision.RESTART
     }
 }
